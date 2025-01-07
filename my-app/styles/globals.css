@@ -1,0 +1,91 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 95vh;
+}
+[class^="input"] {
+    padding: 6px;
+    font-size: medium;
+    border: 3px solid rgb(255, 210, 125);
+    border-radius: 10px;
+}
+[class^="input"]:focus {
+    outline: 3px solid rgb(255, 166, 0);
+}
+.input-passw {
+    margin-top: 7px;
+}
+
+[class^="input"]::placeholder {
+    color: rgb(253, 207, 123);
+    font-weight: 400;
+}
+.box {
+    height: 120px;
+    width: 120px;
+    margin-bottom: 30px;
+}
+
+.register-button, .login-button, .register-button2 {
+    padding: 5px;
+    font-size: 12px;
+    border: 3px solid rgb(255, 210, 125);
+    color: rgb(253, 207, 123);
+    border-radius: 10px;
+    background-color: white;
+    margin-top: 2px;
+    cursor: pointer;
+    font-weight: 400;
+}
+.register-button2 {
+    margin-top: 5px;
+}
+.register-button:hover, .login-button:hover, .register-button2:hover {
+    background-color: rgb(255, 248, 234);
+}
+.register-button {
+    margin-right: 20px;
+}
+.login-button {
+    margin-left: 21px;
+}
+
+.input-name {
+    margin-right: 2.5px;
+    width: 150px;
+}
+.input-surname {
+    margin-left: 2.5px;
+    width: 150px;
+}
+.input-address, .input-phone {
+    width: 324px;
+    margin-top: 5px;
+}
+.form {
+    display: flex;
+    flex-direction: column;
+}
+.error {
+    color: red;
+    margin-top: 10px;
+    font-size: medium;
+}
+.eye {
+    border: none;
+    text-decoration: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+.button-eye {
+    position: relative;
+    border: none;
+    text-decoration: none;
+    background-color: transparent;
+    top: -32px;
+    left: 175px;
+    width: 10px;
+    height: 0px;
+}
