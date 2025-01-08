@@ -26,6 +26,7 @@ const HomePage = () => {
             })
             if (response.ok) {
                 console.log("Login successful")
+                router.push("/mainPage")
             } else {
                 setError("error during logging in")
             }

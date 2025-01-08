@@ -99,3 +99,56 @@
     width: 10px;
     height: 0px;
 }
+.mainPage {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
+}
+.mainHeader {
+    background-color: rgb(222, 222, 222);
+    width: 100%;
+    height: 5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-bottom: 10px;
+}
+.main-1, .main-3 {
+    background-color: rgb(222, 222, 222); 
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.main-1 {
+    height: 53vh;
+}
+.main-3 {
+    height: 39.3vh;
+}
+  
+.main-2 {
+    background-color: rgb(222, 222, 222); 
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 93.5vh; 
+    grid-row: span 2; 
+}
+
+.menuPage {
+    position: absolute;
+    height: 100%;
+    width: 320px;
+    background-color: red;
+    top: 0;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    margin-left: 0;
+}
+.body {
+    margin: -8px;
+}
