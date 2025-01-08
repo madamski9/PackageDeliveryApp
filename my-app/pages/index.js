@@ -12,13 +12,27 @@ const HomePage = () => {
     const [showPassword, setShowPassword] = useState(false)
     console.log(login, password)
     
-    const handleSumbit = (e) => {
+    const handleSumbit = async (e) => {
         e.preventDefault()
         if (!login || !password) {
             setError("Wszystkie pola są wymagane!");
             return;
         }
         console.log("submit dziala")
+        try {
+            const response = await fetch(`http://localhost:3001/home?name=${encodeURIComponent(login)}&password=${encodeURIComponent(password)}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            })
+            if (response.ok) {
+                console.log("Login successful")
+            } else {
+                setError("error during logging in")
+            }
+        } catch (error) {
+            console.error(error)
+            setError("Something went wrong with database")
+        }
     }
 
     useEffect(() => {
@@ -26,7 +40,7 @@ const HomePage = () => {
         if (!page || page !== "home") {
             router.replace("/?page=home");
         }
-    }, [page, router])
+    }, [page, router]) 
 
     return (
         <div className="main">
@@ -69,7 +83,7 @@ const HomePage = () => {
                     </button>
                 </div>
             </form>
-            {error && <div className="error">{error}</div>}
+            {error && <div className="error">{error}</div>} 
         </div>
     )
 }

@@ -89,3 +89,13 @@
     width: 10px;
     height: 0px;
 }
+.button-eye2 {
+    position: relative;
+    border: none;
+    text-decoration: none;
+    background-color: transparent;
+    top: -32px;
+    left: 300px;
+    width: 10px;
+    height: 0px;
+}

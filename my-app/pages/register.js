@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { useRouter } from "next/router"
+
 const RegisterPage = () => {
     const [name, setName] = useState("")
     const [surname, setSurname] = useState("")
@@ -6,12 +8,33 @@ const RegisterPage = () => {
     const [phone, setPhone] = useState("")
     const [addres, setAddres] = useState("")
     const [error, setError] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
+    const router = useRouter()
 
-    const handleSumbit = (e) => {
+    const handleSumbit = async (e) => {
         e.preventDefault()
         if (!name || !surname || !password || !phone || !addres) {
             setError("Wszystkie pola są wymagane!")
             return
+        }
+        try {
+            const response = await fetch("http://localhost:3001/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name, surname, password, phone, addres})
+            })
+
+            if (response.ok) {
+                console.log("Registration successful")
+                router.push("/?page=home")
+            } else {
+                setError("error during registration")
+            }
+        } catch (error) {
+            console.error(error)
+            setError("Something went wrong with database")
         }
     }
 
@@ -48,13 +71,22 @@ const RegisterPage = () => {
                     onChange={(e) => setPhone(e.target.value)}
                 />
                 <input
-                    type="text"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="Hasło"
                     className="input-phone"
                     onChange={(e) => setPassword(e.target.value)}
                 />
+                <button 
+                    className="button-eye2"
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <img className="eye" src="/images/hidden.png"/> : <img className="eye" src="/images/eye-2.png"/>}
+                </button>
                 <div className="buttons">
-                    <button className="register-button2">
+                    <button 
+                        className="register-button2"
+                        type="submit"
+                    >
                         Zarejestruj się
                     </button>
                 </div>
