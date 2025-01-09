@@ -30,7 +30,11 @@ const RegisterPage = () => {
                 console.log("Registration successful")
                 router.push("/?page=home")
             } else {
-                setError("error during registration")
+                if (response.status === 409) {
+                    setError("Username already taken")
+                } else {
+                    setError("Phone number must be integer")
+                }
             }
         } catch (error) {
             console.error(error)

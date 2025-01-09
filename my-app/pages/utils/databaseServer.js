@@ -20,13 +20,23 @@ app.post('/register', async (req, res) => {
   const { name, surname, password, phone, addres } = req.body
   try {
     const client = await pool.connect()
-    const result = await client.query(
-      'INSERT INTO public.user (name, surname, password, phone, addres) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [name, surname, password, phone, addres]
+    const checkName = await client.query(
+      'SELECT name FROM public.user WHERE name = $1',
+      [name]
     )
-    console.log(result.rows)
-    client.release() 
-    res.status(201).json(result.rows[0])
+    console.log(checkName.rows)
+    if (checkName.rows.length > 0) {
+      console.log("nazwa juz istnieje")
+      client.release() 
+      res.status(409).send("Name is taken")
+    } else {
+      const result = await client.query(
+        'INSERT INTO public.user (name, surname, password, phone, addres) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [name, surname, password, phone, addres]
+      )
+      console.log(result.rows)
+      res.status(201).json(result.rows[0])
+    }
   } catch (err) {
     console.error(err)
     res.status(500).send('Error inserting data into the database')
