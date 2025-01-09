@@ -2,6 +2,8 @@ import express from 'express';
 import pkg from 'pg';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import bcrypt from 'bcrypt'
+
 const { Pool } = pkg
 
 export const app = express()
@@ -18,6 +20,7 @@ export const pool = new Pool({
 
 app.post('/register', async (req, res) => {
   const { name, surname, password, phone, addres } = req.body
+  const hash = await bcrypt.hash(password, 10)
   try {
     const client = await pool.connect()
     const checkName = await client.query(
@@ -32,7 +35,7 @@ app.post('/register', async (req, res) => {
     } else {
       const result = await client.query(
         'INSERT INTO public.user (name, surname, password, phone, addres) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [name, surname, password, phone, addres]
+        [name, surname, hash, phone, addres]
       )
       console.log(result.rows)
       res.status(201).json(result.rows[0])
@@ -43,17 +46,24 @@ app.post('/register', async (req, res) => {
   }
 })
 
-app.get('/home', async (req, res) => {
-  const { name, password } = req.query
+app.post('/home', async (req, res) => {
+  const { name, password } = req.body
   try {
     const client = await pool.connect()
     const result = await client.query(
-      'SELECT * FROM public.user WHERE name = $1 AND password = $2',
-      [name, password]
+      'SELECT * FROM public.user WHERE name = $1',
+      [name]
     )
+    if (result.rows.length === 0) {
+      res.status(401).send('Invalid username or password')
+      client.release()
+      return
+    }
     console.log(result.rows[0])
-    if (result.rows.length > 0) {
-      res.status(200).json(result.rows[0])
+    const user = result.rows[0]
+    const isValid = await bcrypt.compare(password, user.password)
+    if (isValid) {
+      res.status(201).json(user)
     } else {
       res.status(401).send('Invalid username or password')
     }

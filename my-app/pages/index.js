@@ -12,7 +12,7 @@ const HomePage = () => {
     const [showPassword, setShowPassword] = useState(false)
     console.log(login, password)
     
-    const handleSumbit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         if (!login || !password) {
             setError("Wszystkie pola są wymagane!");
@@ -20,9 +20,10 @@ const HomePage = () => {
         }
         console.log("submit dziala")
         try {
-            const response = await fetch(`http://localhost:3001/home?name=${encodeURIComponent(login)}&password=${encodeURIComponent(password)}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
+            const response = await fetch(`http://localhost:3001/home`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: login, password: password })
             })
             if (response.ok) {
                 console.log("Login successful")
@@ -48,7 +49,7 @@ const HomePage = () => {
             <img 
                 src="/images/package.png" 
                 className="box"/>
-            <form onSubmit={handleSumbit} className="form">
+            <form onSubmit={handleSubmit} className="form">
                 <input
                     type="text"
                     placeholder="Login"
