@@ -100,6 +100,7 @@ const mainPage = () => {
                                         <div key={index}>
                                             <p>Package Number: {pkg.number}</p>
                                             <p>Package name: {pkg.name}</p>
+                                            <p>Package status: {pkg.status}</p>
                                         </div>
                                     ))
                                 ) : (

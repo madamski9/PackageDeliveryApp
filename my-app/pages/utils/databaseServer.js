@@ -82,9 +82,10 @@ app.post("/api/addPackage", async (req, res) => {
   const { number, name } = req.body
   try {
     const client = await pool.connect()
+    const initialStatus = "Sent"
     const result = await client.query(
-      'INSERT INTO public.packages (number, name) VALUES ($1, $2) RETURNING *',
-      [number, name]
+      'INSERT INTO public.packages (number, name, status) VALUES ($1, $2, $3) RETURNING *',
+      [number, name, initialStatus]
     )
     client.release()
     console.log(result.rows[0])
@@ -95,6 +96,29 @@ app.post("/api/addPackage", async (req, res) => {
     res.status(500).send("Error adding package")
   }
 })
+const statusSequence = ["Sent", "Accepted for execution", "On the way", "Delivered"]
+const updatePackageStatus = async () => {
+  try {
+    const client = await pool.connect()
+    const result = await client.query(`SELECT id, status FROM public.packages WHERE status != 'Delivered'`)
+    console.log(result.rows)
+    for (let packages of result.rows) {
+      const currIdx = statusSequence.indexOf(packages.status) 
+      if (currIdx >= 0 && currIdx < statusSequence.length - 1) {
+        const newStatus = statusSequence[currIdx + 1]
+        await client.query(
+          'UPDATE public.packages SET status = $1 WHERE id = $2',
+          [newStatus, packages.id]
+        )
+        console.log(`Updated package ${packages.id} to status: ${newStatus}`)
+      }
+    }
+    client.release()
+  } catch (error) {
+    console.error("Error updating package status:", error)
+  }
+}
+setInterval(updatePackageStatus, 1 * 60 * 1000) //* co minute
 
 app.get("/api/getPackage", async (req, res) => {
   try {
