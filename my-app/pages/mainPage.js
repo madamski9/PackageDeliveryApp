@@ -8,6 +8,7 @@ const mainPage = () => {
     const [headerInput, setHeaderInput] = useState("")
     const [activePage, setActivePage] = useState("Overview")
     const [fetchPackage, setfetchPackage] = useState([])
+    const [fetchUser, setFetchUser] = useState([])
 
     const handleMenuClick = () => {
         console.log("przycisk dziala")
@@ -16,7 +17,10 @@ const mainPage = () => {
 
     const fetchPackages = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/addPackage`)
+            const response = await fetch(`http://localhost:3001/api/getPackage`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            })
             if (response.ok) {
                 const data = await response.json()
                 setfetchPackage(data)
@@ -26,12 +30,33 @@ const mainPage = () => {
             console.error("error fetching packages", error)
         }
     }
+    const fetchUserData = async () => {
+        const userId = localStorage.getItem("userId")
+        try {
+            const response = await fetch(`http://localhost:3001/api/getUserData?userId=${userId}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            })
+            if (response.ok) {
+                const data = await response.json()
+                setFetchUser(data)
+                console.log(data)
+            } else {
+                if (response.status === 500) {
+                    console.error("Something wrong while fetching user data - error 500")
+                }
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
-    // useEffect(() => {
-    //     if (activePage === "Overview") {
-    //         fetchPackages()
-    //     }
-    // }, [activePage])
+    useEffect(() => {
+        if (activePage === "Overview") {
+            fetchPackages()
+            fetchUserData()
+        }
+    }, [activePage])
 
     const renderContent = () => {
         renderContentLongDiv()
@@ -40,7 +65,7 @@ const mainPage = () => {
                 return (
                         <div className="overview-grid">
                             <div className="overview-main-1">
-                                Add new package
+                                <p>Add new package</p>
                                 <button
                                     className="addPackageButton"
                                     onClick={(e) => {
@@ -51,20 +76,36 @@ const mainPage = () => {
                                     +
                                 </button>
                                 <div className="overview-packages">
-                                    {fetchPackage.length > 0 ? (
-                                        fetchPackage.map((pkg, index) => (
-                                            <div key={index}>
-                                                <p>Package Number: {pkg.number}</p>
-                                                <p>Package name: {pkg.name}</p>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <p>No packages avaible</p>
-                                    )}
+                                    
                                 </div>
                             </div>
-                            <div className="overview-main-2">User data</div>
-                            <div className="overview-main-3">Your packages</div>
+                            <div className="overview-main-2">
+                                <p>User data</p>
+                                {fetchUser.length > 0 ? (
+                                    fetchUser.map((user, index) => (
+                                        <div key={index}>
+                                            <p>Name: {user.name}</p>
+                                            <p>Surname: {user.surname}</p>
+                                            <p>Phone: {user.phone}</p>
+                                            <p>Address: {user.addres}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>No user data</p>
+                                )}
+                            </div>
+                            <div className="overview-main-3"><p>Your packages</p>
+                                {fetchPackage.length > 0 ? (
+                                    fetchPackage.map((pkg, index) => (
+                                        <div key={index}>
+                                            <p>Package Number: {pkg.number}</p>
+                                            <p>Package name: {pkg.name}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>No packages avaible</p>
+                                )}
+                            </div>
                         </div>
                     )
             case "History":

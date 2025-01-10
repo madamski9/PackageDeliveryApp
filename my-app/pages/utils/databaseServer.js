@@ -63,7 +63,10 @@ app.post('/home', async (req, res) => {
     const user = result.rows[0]
     const isValid = await bcrypt.compare(password, user.password)
     if (isValid) {
-      res.status(201).json(user)
+      res.status(201).json({
+        id: user.id,
+        name: user.name
+      })
     } else {
       res.status(401).send('Invalid username or password')
     }
@@ -75,7 +78,7 @@ app.post('/home', async (req, res) => {
   }
 })
 
-app.post("/addPackage", async (req, res) => {
+app.post("/api/addPackage", async (req, res) => {
   const { number, name } = req.body
   try {
     const client = await pool.connect()
@@ -93,18 +96,29 @@ app.post("/addPackage", async (req, res) => {
   }
 })
 
-app.get("/addPackage", async (req, res) => {
-  const { number, name } = req.query
+app.get("/api/getPackage", async (req, res) => {
   try {
     const client = await pool.connect()
-    const result = await client.query(
-      'SELECT * FROM public.packages WHERE number = $1 AND name = $2',
-      [number, name]
-    )
+    const result = await client.query('SELECT * FROM public.packages')
     client.release()
-    res.status(201).json(result.rows[0])
+    res.status(201).json(result.rows)
   } catch (error) {
     res.status(500).send("error fetching datas")
+  }
+})
+
+app.get("/api/getUserData", async (req, res) => {
+  const { userId } = req.query
+  console.log(userId)
+  try {
+    const client = await pool.connect()
+    const result = await client.query('SELECT name, surname, phone, addres FROM public.user WHERE id = $1',
+      [userId]
+    )
+    client.release()
+    res.status(201).json(result.rows)
+  } catch (error) {
+    res.status(500).send("error fetching user data")
   }
 })
 

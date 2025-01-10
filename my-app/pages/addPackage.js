@@ -15,7 +15,7 @@ const addPackage = () => {
             setError("type smth")
         }
         try {
-            const response = await fetch(`http://localhost:3001/addPackage`, {
+            const response = await fetch(`http://localhost:3001/api/addPackage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({name: packageName, number: packageNumber})

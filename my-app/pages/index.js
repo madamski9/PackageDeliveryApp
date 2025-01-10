@@ -26,7 +26,9 @@ const HomePage = () => {
                 body: JSON.stringify({ name: login, password: password })
             })
             if (response.ok) {
+                const data = await response.json()
                 console.log("Login successful")
+                localStorage.setItem("userId", data.id)
                 router.push("/mainPage")
             } else {
                 setError("error during logging in")
