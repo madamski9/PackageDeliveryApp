@@ -75,6 +75,39 @@ app.post('/home', async (req, res) => {
   }
 })
 
+app.post("/addPackage", async (req, res) => {
+  const { number, name } = req.body
+  try {
+    const client = await pool.connect()
+    const result = await client.query(
+      'INSERT INTO public.packages (number, name) VALUES ($1, $2) RETURNING *',
+      [number, name]
+    )
+    client.release()
+    console.log(result.rows[0])
+    res.status(201).json(result.rows[0])
+
+  } catch (error) {
+    console.error("Error adding package:", error)
+    res.status(500).send("Error adding package")
+  }
+})
+
+app.get("/addPackage", async (req, res) => {
+  const { number, name } = req.query
+  try {
+    const client = await pool.connect()
+    const result = await client.query(
+      'SELECT * FROM public.packages WHERE number = $1 AND name = $2',
+      [number, name]
+    )
+    client.release()
+    res.status(201).json(result.rows[0])
+  } catch (error) {
+    res.status(500).send("error fetching datas")
+  }
+})
+
 app.listen(3001, () => {
   console.log('Server running on port 3001')
 })
