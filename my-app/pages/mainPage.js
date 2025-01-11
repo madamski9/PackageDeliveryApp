@@ -9,6 +9,7 @@ const mainPage = () => {
     const [activePage, setActivePage] = useState("Overview")
     const [fetchPackage, setfetchPackage] = useState([])
     const [fetchUser, setFetchUser] = useState([])
+    const [deliveredPackages, setDeliveredPackages] = useState([])
 
     const handleMenuClick = () => {
         console.log("przycisk dziala")
@@ -23,8 +24,11 @@ const mainPage = () => {
             })
             if (response.ok) {
                 const data = await response.json()
-                setfetchPackage(data)
-                console.log(data)
+                const delivered = data.filter(pkg => pkg.status === "Delivered")
+                const notDelivered = data.filter(pkg => pkg.status !== "Delivered")
+
+                setfetchPackage(notDelivered)
+                setDeliveredPackages(delivered)
             }
         } catch (error) {
             console.error("error fetching packages", error)
@@ -65,7 +69,7 @@ const mainPage = () => {
                 return (
                         <div className="overview-grid">
                             <div className="overview-main-1">
-                                <p>Add new package</p>
+                                <p className="addNewPackage">Add new package</p>
                                 <button
                                     className="addPackageButton"
                                     onClick={(e) => {
@@ -73,42 +77,67 @@ const mainPage = () => {
                                         router.push("/addPackage")
                                     }}
                                 >
-                                    +
+                                    <img className="plus" src="/images/plus.png"/>
                                 </button>
-                                <img className="truck" src="/images/box-truck-2.png"/>
+                                <img className="box2" src="/images/logistics.png"/>
                             </div>
                             <div className="overview-main-2">
-                                <p>User data</p>
-                                {fetchUser.length > 0 ? (
-                                    fetchUser.map((user, index) => (
-                                        <div key={index}>
-                                            <p>Name: {user.name}</p>
-                                            <p>Surname: {user.surname}</p>
-                                            <p>Phone: {user.phone}</p>
-                                            <p>Address: {user.addres}</p>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p>No user data</p>
-                                )}
+                                <p className="yourPersDat">Your personal data</p>
+                                    <div className="user-data">
+                                        {fetchUser.length > 0 ? (
+                                            fetchUser.map((user, index) => (
+                                                <div key={index}>
+                                                    <p>Name: {user.name}</p>
+                                                    <p>Surname: {user.surname}</p>
+                                                    <p>Phone: {user.phone}</p>
+                                                    <p>Address: {user.addres}</p>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p>No user data</p>
+                                        )}
+                                    </div>
                             </div>
-                            <div className="overview-main-3"><p>Your packages</p>
-                                {fetchPackage.length > 0 ? (
-                                    fetchPackage.map((pkg, index) => (
-                                        <div key={index}>
-                                            <p>Package Number: {pkg.number}</p>
-                                            <p>Package name: {pkg.name}</p>
-                                            <p>Package status: {pkg.status}</p>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p>No packages avaible</p>
-                                )}
+                            <div className="overview-main-3">
+                                <p className="addNewPackage">Your packages</p>
+                                <div className="user-packages">
+                                    {fetchPackage.length > 0 ? (
+                                        fetchPackage.map((pkg, index) => (
+                                            <div key={index}>
+                                                <button className="packages-overview">
+                                                    <img className="truck" src="/images/delivery.png"/>
+                                                    <p>Number: {pkg.number}</p>
+                                                    <p>Name: {pkg.name}</p>
+                                                    <p>Status: {pkg.status}</p>
+                                                </button>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p>No packages avaible</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )
             case "History":
-                return <div>History</div>
+                return (
+                    <div className="history-div">
+                        {deliveredPackages.length > 0 ? (
+                            deliveredPackages.map((pkg, index) => (
+                                <div className="packages-history" key={index}>
+                                    <button className="packages-history-button">
+                                        <img className="truck" src="/images/delivery.png"/>
+                                        <p>Number: {pkg.number}</p>
+                                        <p>Name: {pkg.name}</p>
+                                        <p>Status: {pkg.status}</p>
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No packages avaible</p>
+                        )}
+                    </div>
+                )
             case "Something":
                 return <div>Something</div>
         }
