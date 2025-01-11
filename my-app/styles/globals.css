@@ -251,8 +251,21 @@
     border-radius: 30px;
 }
 .overview-main-1 {
+    display: flex;
+    flex-direction: column;
     grid-column: 1;
     grid-row: 1;
+    background-color: rgb(255, 190, 70);
+}
+.truck {
+    position: fixed;
+    height: 209px;
+    margin-left: 158px;
+    border-radius: 32px;
+}
+.addPackageButton {
+    width: 20px;
+    height: 20px;
 }
 .overview-main-2 {
     grid-column: 2;

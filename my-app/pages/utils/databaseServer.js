@@ -118,7 +118,7 @@ const updatePackageStatus = async () => {
     console.error("Error updating package status:", error)
   }
 }
-setInterval(updatePackageStatus, 1 * 60 * 1000) //* co minute
+setInterval(updatePackageStatus, 5 * 60 * 1000) //* co 5 minut
 
 app.get("/api/getPackage", async (req, res) => {
   try {

@@ -75,9 +75,7 @@ const mainPage = () => {
                                 >
                                     +
                                 </button>
-                                <div className="overview-packages">
-                                    
-                                </div>
+                                <img className="truck" src="/images/box-truck-2.png"/>
                             </div>
                             <div className="overview-main-2">
                                 <p>User data</p>
