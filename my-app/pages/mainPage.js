@@ -16,6 +16,25 @@ const mainPage = () => {
         setMenuVisible(!menuVisible)
     }
 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch("http://localhost:3001/logout", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                credentials: 'include',  
+            });
+            if (response.ok) {
+                console.log("Logged out successfully");
+                localStorage.removeItem("userId");
+                router.push("/?path=home"); 
+            } else {
+                console.error("Logout failed");
+            }
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    }
+
     const fetchPackages = async () => {
         try {
             const response = await fetch(`http://localhost:3001/api/getPackage`, {
@@ -36,6 +55,7 @@ const mainPage = () => {
     }
     const fetchUserData = async () => {
         const userId = localStorage.getItem("userId")
+        console.log(userId)
         try {
             const response = await fetch(`http://localhost:3001/api/getUserData?userId=${userId}`, {
                 method: "GET",
@@ -179,6 +199,7 @@ const mainPage = () => {
                             </button>
                             <button
                                 className="profile"
+                                onClick={() => handleLogout()}
                             >
                                 <img className="user" src="/images/user.png"/>
                             </button>

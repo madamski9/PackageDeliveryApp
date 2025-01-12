@@ -1,6 +1,7 @@
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
+import cookie from "js-cookie"
 
 const HomePage = () => {
     const searchParams = useSearchParams()
@@ -23,7 +24,8 @@ const HomePage = () => {
             const response = await fetch(`http://localhost:3001/home`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: login, password: password })
+                body: JSON.stringify({ name: login, password: password }),
+                credentials: "include"
             })
             if (response.ok) {
                 const data = await response.json()

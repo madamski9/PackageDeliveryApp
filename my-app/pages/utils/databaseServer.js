@@ -3,12 +3,22 @@ import pkg from 'pg';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import bcrypt from 'bcrypt'
+import cookie from "cookie"
+import jwt from "jsonwebtoken"
+import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser';
+dotenv.config()
+console.log('JWT_SECRET:', process.env.NEXT_PUBLIC_JWT_SECRET)
 
 const { Pool } = pkg
-
+const allowedOrigins = ['http://localhost:3000']
 export const app = express()
 app.use(bodyParser.json())
-app.use(cors())
+app.use(cors({
+  origin: allowedOrigins, 
+  credentials: true, 
+}))
+app.use(cookieParser())
 
 export const pool = new Pool({
   user: 'macciek',
@@ -38,7 +48,7 @@ app.post('/register', async (req, res) => {
         [name, surname, hash, phone, addres]
       )
       console.log(result.rows)
-      res.status(201).json(result.rows[0])
+      res.status(200).json(result.rows[0])
     }
   } catch (err) {
     console.error(err)
@@ -59,11 +69,29 @@ app.post('/home', async (req, res) => {
       client.release()
       return
     }
-    console.log(result.rows[0])
+    console.log("login: ", result.rows[0])
     const user = result.rows[0]
+    //! sprawdzenie czy zgadza sie hasz hasla
     const isValid = await bcrypt.compare(password, user.password)
     if (isValid) {
-      res.status(201).json({
+      //! jsonwebtoken
+      const token = jwt.sign(
+        { id: user.id, name: user.name },  
+        process.env.NEXT_PUBLIC_JWT_SECRET,          
+        { expiresIn: '1h' }               
+      )
+      console.log(token)
+      //! ustawienie ciasteczka z tokenem sesji
+      res.setHeader("Set-Cookie", cookie.serialize("token", token, {
+        httpOnly: true,
+        secure: false,//process.env.NODE_ENV !== "development",
+        maxAge: 60 * 60,
+        sameSite: "strict",
+        path: "/"
+      }))
+      console.log("Set-Cookie header:", res.getHeaders()['set-cookie']);
+      console.log("ciasteczka1:", req.cookies)
+      res.status(200).json({
         id: user.id,
         name: user.name
       })
@@ -71,11 +99,21 @@ app.post('/home', async (req, res) => {
       res.status(401).send('Invalid username or password')
     }
     client.release()
-
   } catch (err) {
     console.error(err)
     res.status(500).send('Error selecting data from database')
   }
+})
+app.post("/logout", (req, res) => {
+  console.log("logout succesful")
+  res.setHeader("Set-Cookie", cookie.serialize("token", "", {
+    httpOnly: true,
+    secure: false,//process.env.NODE_ENV !== "development",
+    maxAge: -1, 
+    sameSite: "strict",
+    path: "/"
+  }));
+  res.status(200).json({ message: "Logged out successfully" });
 })
 
 app.post("/api/addPackage", async (req, res) => {
@@ -89,7 +127,7 @@ app.post("/api/addPackage", async (req, res) => {
     )
     client.release()
     console.log(result.rows[0])
-    res.status(201).json(result.rows[0])
+    res.status(200).json(result.rows[0])
 
   } catch (error) {
     console.error("Error adding package:", error)
@@ -125,7 +163,7 @@ app.get("/api/getPackage", async (req, res) => {
     const client = await pool.connect()
     const result = await client.query('SELECT * FROM public.packages')
     client.release()
-    res.status(201).json(result.rows)
+    res.status(200).json(result.rows)
   } catch (error) {
     res.status(500).send("error fetching datas")
   }
@@ -133,14 +171,15 @@ app.get("/api/getPackage", async (req, res) => {
 
 app.get("/api/getUserData", async (req, res) => {
   const { userId } = req.query
-  console.log(userId)
+  console.log("userId: ", userId)
+  console.log("ciasteczka: ", req.cookies)
   try {
     const client = await pool.connect()
     const result = await client.query('SELECT name, surname, phone, addres FROM public.user WHERE id = $1',
       [userId]
     )
     client.release()
-    res.status(201).json(result.rows)
+    res.status(200).json(result.rows)
   } catch (error) {
     res.status(500).send("error fetching user data")
   }
