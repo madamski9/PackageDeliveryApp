@@ -138,8 +138,8 @@ const mainPage = () => {
                         )}
                     </div>
                 )
-            case "Something":
-                return <div>Something</div>
+            case "Package locker":
+                return <div>Package locker</div>
         }
     }
     const renderContentLongDiv = () => {
@@ -150,8 +150,8 @@ const mainPage = () => {
                 )
             case "History":
                 return <div className="long-div-history">Long Div History</div>
-            case "Something":
-                return <div className="long-div">Long Div Something</div>
+            case "Package locker":
+                return <div className="long-div">Long Div Package locker</div>
         }
     }
     
@@ -196,8 +196,8 @@ const mainPage = () => {
                             >History</button>
                             <button 
                                 className="button-main-2"
-                                onClick={() => setActivePage("Something")}
-                            >Something</button>
+                                onClick={() => setActivePage("Package locker")}
+                            >Package locker</button>
                         </div>
                         <div>{renderContent()}</div>
                     </div>
