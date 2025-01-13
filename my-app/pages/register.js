@@ -18,7 +18,7 @@ const RegisterPage = () => {
             return
         }
         try {
-            const response = await fetch("http://localhost:3001/register", {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

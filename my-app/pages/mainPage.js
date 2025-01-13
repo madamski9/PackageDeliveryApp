@@ -18,7 +18,7 @@ const mainPage = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch("https://localhost:3001/logout", {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/logout`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 credentials: 'include',  
@@ -37,7 +37,7 @@ const mainPage = () => {
 
     const fetchPackages = async () => {
         try {
-            const response = await fetch(`https://localhost:3001/api/getPackage`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/getPackage`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             })
@@ -57,7 +57,7 @@ const mainPage = () => {
         const userId = localStorage.getItem("userId")
         console.log(userId)
         try {
-            const response = await fetch(`https://localhost:3001/api/getUserData?userId=${userId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/getUserData?userId=${userId}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             })

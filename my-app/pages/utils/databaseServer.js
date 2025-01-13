@@ -1,16 +1,15 @@
-import express from 'express';
-import pkg from 'pg';
-import bodyParser from 'body-parser';
-import cors from 'cors';
+import express from 'express'
+import pkg from 'pg'
+import bodyParser from 'body-parser'
+import cors from 'cors'
 import bcrypt from 'bcrypt'
 import cookie from "cookie"
 import jwt from "jsonwebtoken"
-import fs from 'fs';
-import https from 'https';
+import fs from 'fs'
+import https from 'https'
 import dotenv from 'dotenv'
-import cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser'
 dotenv.config()
-console.log('JWT_SECRET:', process.env.NEXT_PUBLIC_JWT_SECRET)
 
 const { Pool } = pkg
 const allowedOrigins = ['https://localhost:3000']

@@ -1,6 +1,8 @@
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
+import dotenv from "dotenv"
+dotenv.config()
 
 const HomePage = () => {
     const searchParams = useSearchParams()
@@ -20,7 +22,7 @@ const HomePage = () => {
         }
         console.log("submit dziala")
         try {
-            const response = await fetch(`https://localhost:3001/home`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/home`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name: login, password: password }),
