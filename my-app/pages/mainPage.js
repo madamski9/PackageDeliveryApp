@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 const mainPage = () => {
     const router = useRouter()
     const [menuVisible, setMenuVisible] = useState(false)
+    const [userInfoVisible, setUserInfoVisible] = useState(false)
     const [headerInput, setHeaderInput] = useState("")
     const [activePage, setActivePage] = useState("Overview")
     const [fetchPackage, setfetchPackage] = useState([])
@@ -14,6 +15,10 @@ const mainPage = () => {
     const handleMenuClick = () => {
         console.log("przycisk dziala")
         setMenuVisible(!menuVisible)
+    }
+
+    const handleUserInfoClick = () => {
+        setUserInfoVisible(!userInfoVisible)
     }
 
     const handleLogout = async () => {
@@ -36,13 +41,16 @@ const mainPage = () => {
     }
 
     const fetchPackages = async () => {
+        const userId = localStorage.getItem("userId")
+        console.log("userId: ", userId)
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/getPackage`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/getPackage?userId=${userId}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             })
             if (response.ok) {
                 const data = await response.json()
+                console.log(data)
                 const delivered = data.filter(pkg => pkg.status === "Delivered")
                 const notDelivered = data.filter(pkg => pkg.status !== "Delivered")
 
@@ -199,10 +207,24 @@ const mainPage = () => {
                             </button>
                             <button
                                 className="profile"
-                                onClick={() => handleLogout()}
+                                onClick={() => handleUserInfoClick()}
                             >
                                 <img className="user" src="/images/user.png"/>
                             </button>
+                            {userInfoVisible && (
+                                <>
+                                    <div className="arrow"></div>
+                                    <div className="userInfo">
+                                        <button 
+                                            className="buttonLogout"
+                                            onClick={() => handleLogout()}
+                                        >
+                                            Logout
+                                            <img className="logoutImg" src="/images/logout.png"/>
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                     <div className="main-2">

@@ -124,13 +124,13 @@ app.post("/logout", (req, res) => {
 })
 
 app.post("/api/addPackage", async (req, res) => {
-  const { number, name } = req.body
+  const { userId, number, name } = req.body
   try {
     const client = await pool.connect()
     const initialStatus = "Sent"
     const result = await client.query(
-      'INSERT INTO public.packages (number, name, status) VALUES ($1, $2, $3) RETURNING *',
-      [number, name, initialStatus]
+      'INSERT INTO public.packages (userId, number, name, status) VALUES ($1, $2, $3, $4) RETURNING *',
+      [userId, number, name, initialStatus]
     )
     client.release()
     console.log(result.rows[0])
@@ -166,9 +166,12 @@ const updatePackageStatus = async () => {
 setInterval(updatePackageStatus, 30 * 60 * 1000) //* co pol godziny
 
 app.get("/api/getPackage", async (req, res) => {
+  const { userId } = req.query
   try {
     const client = await pool.connect()
-    const result = await client.query('SELECT * FROM public.packages')
+    const result = await client.query('SELECT * FROM public.packages WHERE userId = $1',
+      [userId]
+    )
     client.release()
     res.status(200).json(result.rows)
   } catch (error) {

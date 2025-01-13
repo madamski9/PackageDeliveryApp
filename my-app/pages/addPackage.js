@@ -11,14 +11,16 @@ const addPackage = () => {
     
     const handleAddPackageSumbit = async (e) => {
         e.preventDefault()
+        const userId = localStorage.getItem("userId")
+        console.log(`uzytkownik ${userId} dodaje paczke...`)
         if (!packageName || !packageNumber) {
             setError("type smth")
         }
         try {
-            const response = await fetch(`https://localhost:3001/api/addPackage`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/addPackage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({name: packageName, number: packageNumber})
+                body: JSON.stringify({userId: userId, name: packageName, number: packageNumber})
             })
             if (response.ok) {
                 console.log("Package added")
