@@ -9,8 +9,27 @@ const mainPage = () => {
     const [headerInput, setHeaderInput] = useState("")
     const [activePage, setActivePage] = useState("Overview")
     const [fetchPackage, setfetchPackage] = useState([])
+    const [filteredPackages, setFilteredPackages] = useState([])
+    const [filteredDeliveredPackages, setFilteredDeliveredPackages] = useState([])
     const [fetchUser, setFetchUser] = useState([])
     const [deliveredPackages, setDeliveredPackages] = useState([])
+    console.log(headerInput)
+
+    const handleSearchInput = (e) => {
+        if (activePage === "Overview") {
+            setFilteredPackages(
+                e === ""
+                    ? fetchPackage
+                    : fetchPackage.filter(paczka => paczka.number.startsWith(e))
+            )
+        } else if (activePage === "History") {
+            setFilteredDeliveredPackages(
+                e === ""
+                    ? deliveredPackages
+                    : deliveredPackages.filter(paczka => paczka.number.startsWith(e))
+            )
+        }
+    }
 
     const handleMenuClick = () => {
         console.log("przycisk dziala")
@@ -55,7 +74,9 @@ const mainPage = () => {
                 const notDelivered = data.filter(pkg => pkg.status !== "Delivered")
 
                 setfetchPackage(notDelivered)
+                setFilteredPackages(notDelivered)
                 setDeliveredPackages(delivered)
+                setFilteredDeliveredPackages(delivered)
             }
         } catch (error) {
             console.error("error fetching packages", error)
@@ -89,6 +110,10 @@ const mainPage = () => {
             fetchUserData()
         }
     }, [activePage])
+
+    useEffect(() => {
+        handleSearchInput(headerInput)
+    }, [headerInput])
 
     const renderContent = () => {
         renderContentLongDiv()
@@ -129,8 +154,8 @@ const mainPage = () => {
                             <div className="overview-main-3">
                                 <p className="addNewPackage">Your packages</p>
                                 <div className="user-packages">
-                                    {fetchPackage.length > 0 ? (
-                                        fetchPackage.map((pkg, index) => (
+                                    {filteredPackages.length > 0 ? (
+                                        filteredPackages.map((pkg, index) => (
                                             <div key={index}>
                                                 <button className="packages-overview">
                                                     <img className="truck" src="/images/delivery.png"/>
@@ -150,8 +175,8 @@ const mainPage = () => {
             case "History":
                 return (
                     <div className="history-div">
-                        {deliveredPackages.length > 0 ? (
-                            deliveredPackages.map((pkg, index) => (
+                        {filteredDeliveredPackages.length > 0 ? (
+                            filteredDeliveredPackages.map((pkg, index) => (
                                 <div className="packages-history" key={index}>
                                     <button className="packages-history-button">
                                         <img className="truck" src="/images/delivery.png"/>

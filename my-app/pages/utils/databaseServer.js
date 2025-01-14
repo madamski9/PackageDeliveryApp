@@ -194,9 +194,6 @@ app.get("/api/getUserData", async (req, res) => {
   }
 })
 
-// app.listen(3001, () => {
-//   console.log('Server running on port 3001')
-// })
 https.createServer(options, app).listen(3001, () => {
   console.log('API server running on https://localhost:3001');
 });
