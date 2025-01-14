@@ -124,13 +124,13 @@ app.post("/logout", (req, res) => {
 })
 
 app.post("/api/addPackage", async (req, res) => {
-  const { userId, number, name } = req.body
+  const { userId, number, name, packageLocker } = req.body
   try {
     const client = await pool.connect()
     const initialStatus = "Sent"
     const result = await client.query(
-      'INSERT INTO public.packages (userId, number, name, status) VALUES ($1, $2, $3, $4) RETURNING *',
-      [userId, number, name, initialStatus]
+      'INSERT INTO public.packages (userId, number, name, status, packageLocker) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [userId, number, name, initialStatus, packageLocker]
     )
     client.release()
     console.log(result.rows[0])
@@ -173,6 +173,7 @@ app.get("/api/getPackage", async (req, res) => {
       [userId]
     )
     client.release()
+    console.log(result.rows)
     res.status(200).json(result.rows)
   } catch (error) {
     res.status(500).send("error fetching datas")

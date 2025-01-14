@@ -12,7 +12,12 @@ const HomePage = () => {
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
     const [showPassword, setShowPassword] = useState(false)
-    console.log(login, password)
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const randomNumbers = Array.from({ length: 200 }, () => Math.random());
+            localStorage.setItem("random", JSON.stringify(randomNumbers));
+        }
+    }, []);
     
     const handleSubmit = async (e) => {
         e.preventDefault()

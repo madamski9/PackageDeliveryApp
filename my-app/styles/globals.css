@@ -458,6 +458,8 @@
 
 .locker-grid {
     display: grid;
+    position: absolute;
+    right: 400px;
     grid-template-columns: repeat(8, 60px); 
     background-color: transparent;
     padding: 10px;
@@ -494,9 +496,9 @@
 .locker.top {
     position: absolute;
     height: 10px;
-    width: 500px;
-    left: 575px;
-    top: 238px;
+    width: 495px;
+    left: 0;
+    top: 0;
     border-bottom: 4px solid #242424;
     cursor:default;
 }
@@ -538,7 +540,8 @@
     border: none;
     background-color: rgb(141, 254, 127);
     height: 40px;
-    width: 96%;
+    min-width: 92%;
+    max-width: 92%;
     align-items: center;
     margin-bottom: 9px;
     border-radius: 30px;

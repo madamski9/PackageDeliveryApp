@@ -16,11 +16,12 @@ const addPackage = () => {
         if (!packageName || !packageNumber) {
             setError("type smth")
         }
+        const number = Math.floor(Math.random()*3) + 1
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/addPackage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({userId: userId, name: packageName, number: packageNumber})
+                body: JSON.stringify({userId: userId, name: packageName, number: packageNumber, packageLocker: number})
             })
             if (response.ok) {
                 console.log("Package added")
