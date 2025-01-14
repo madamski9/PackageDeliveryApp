@@ -415,6 +415,19 @@
     right: 360px;
     background-color: rgb(234, 234, 234);
     border-radius: 20px;
+    z-index: 2;
+}
+.exitBigDiv {
+    position: absolute;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    width: 175vh;
+    background-color: transparent;
+    z-index: 1;
+}
+.profile {
+    z-index: 2;
 }
 .arrow {
     position: absolute;
@@ -424,6 +437,7 @@
     right: 373px;
     background-color: rgb(234, 234, 234);
     clip-path: polygon(50% 97%, 0% 100%, 100% 100%);
+    z-index: 2;
 }
 .buttonLogout {
     display: flex;
@@ -440,4 +454,105 @@
     height: 22px;
     width: 22px;
     margin-left: 8px;
+}
+
+.locker-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 60px); 
+    background-color: transparent;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+  
+.locker {
+    background-color: #ffffff;
+    border: 3px solid #242424;
+    cursor: pointer;
+}
+.locker.normal:hover {
+    background-color: #e9e9e9;
+}
+.locker.normal:active {
+    background-color: #c1c1c1;
+}
+.locker.large:hover {
+    background-color: #e9e9e9;
+}
+.locker.large:active {
+    background-color: #c1c1c1;
+}
+
+.locker.large {
+    height: 60px; 
+}
+
+.locker.normal {
+    height: 34px; 
+}
+.locker.top {
+    position: absolute;
+    height: 10px;
+    width: 500px;
+    left: 575px;
+    top: 138px;
+    border-bottom: 4px solid #242424;
+    cursor:default;
+}
+.large.ld, .large.d, .large.rd {
+    border-bottom: 12px solid #242424;
+}
+.large.l, .normal.l, .large.ld {
+    border-left: 12px solid #242424;
+}
+.large.r, .normal.r, .large.rd {
+    border-right: 12px solid #242424;
+}
+
+.locker.double-small {
+    display: flex;
+    flex-direction: column;
+    height: 36px; 
+    border: 2px solid #242424;
+}
+
+.locker.double-small .small {
+    height: 17px; 
+    background-color: #ffffff;
+    border: 2px solid #242424;
+}
+.locker.double-small .small:hover {
+    background-color: #e9e9e9;
+}
+.locker.double-small .small:active {
+    background-color: #c1c1c1;
+}
+.locker-main {
+    display: flex;
+    margin-top: 20px;
+}
+
+.packages-locker {
+    display: flex;
+    border: none;
+    background-color: rgb(141, 254, 127);
+    height: 40px;
+    width: 96%;
+    align-items: center;
+    margin-bottom: 9px;
+    border-radius: 30px;
+    font-weight: 500;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+.packages-locker p {
+    margin-left: 20px;
+}
+.packages-locker:hover {
+    background-color: rgb(125, 232, 111)
+}
+.packages-locker:active {
+    background-color: rgb(117, 216, 104)
 }
