@@ -1,6 +1,11 @@
 import { useState, useEffect, act } from "react";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
+import "./components/Overview.js"
+import Overview from "./components/Overview.js";
+import History from "./components/History.js";
+import PackageLocker from "./components/PackageLocker.js";
+import Header from "./components/Header.js";
 
 const mainPage = () => {
     const router = useRouter()
@@ -17,28 +22,13 @@ const mainPage = () => {
 
     const handleSearchInput = (e) => {
         if (activePage === "Overview") {
-            setFilteredPackages(
-                e === ""
-                    ? fetchPackage
-                    : fetchPackage.filter(paczka => paczka.number.startsWith(e))
-            )
+            setFilteredPackages(e === "" ? fetchPackage : fetchPackage.filter(paczka => paczka.number.startsWith(e)))
         } else if (activePage === "History") {
-            setFilteredDeliveredPackages(
-                e === ""
-                    ? deliveredPackages
-                    : deliveredPackages.filter(paczka => paczka.number.startsWith(e))
-            )
+            setFilteredDeliveredPackages(e === "" ? deliveredPackages : deliveredPackages.filter(paczka => paczka.number.startsWith(e)))
         }
     }
-
-    const handleMenuClick = () => {
-        console.log("przycisk dziala")
-        setMenuVisible(!menuVisible)
-    }
-
-    const handleUserInfoClick = () => {
-        setUserInfoVisible(!userInfoVisible)
-    }
+    const handleMenuClick = () => setMenuVisible(!menuVisible)
+    const handleUserInfoClick = () => setUserInfoVisible(!userInfoVisible)
 
     const handleLogout = async () => {
         try {
@@ -119,138 +109,11 @@ const mainPage = () => {
         renderContentLongDiv()
         switch (activePage) {
             case "Overview":
-                return (
-                        <div className="overview-grid">
-                            <div className="overview-main-1">
-                                <p className="addNewPackage">Add new package</p>
-                                <button
-                                    className="addPackageButton"
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        router.push("/addPackage")
-                                    }}
-                                >
-                                    <img className="plus" src="/images/plus.png"/>
-                                </button>
-                                <img className="box2" src="/images/logistics.png"/>
-                            </div>
-                            <div className="overview-main-2">
-                                <p className="yourPersDat">Your personal data</p>
-                                    <div className="user-data">
-                                        {fetchUser.length > 0 ? (
-                                            fetchUser.map((user, index) => (
-                                                <div key={index}>
-                                                    <p>Name: {user.name}</p>
-                                                    <p>Surname: {user.surname}</p>
-                                                    <p>Phone: {user.phone}</p>
-                                                    <p>Address: {user.addres}</p>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <p>No user data</p>
-                                        )}
-                                    </div>
-                            </div>
-                            <div className="overview-main-3">
-                                <p className="addNewPackage">Your packages</p>
-                                <div className="user-packages">
-                                    {filteredPackages.length > 0 ? (
-                                        filteredPackages.map((pkg, index) => (
-                                            <div key={index}>
-                                                <button className="packages-overview">
-                                                    <img className="truck" src="/images/delivery.png"/>
-                                                    <p>Number: {pkg.number}</p>
-                                                    <p>Name: {pkg.name}</p>
-                                                    <p>Status: {pkg.status}</p>
-                                                </button>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <p>No packages avaible</p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )
+                return <Overview fetchUser={fetchUser} filteredPackages={filteredPackages}/>
             case "History":
-                return (
-                    <div className="history-div">
-                        {filteredDeliveredPackages.length > 0 ? (
-                            filteredDeliveredPackages.map((pkg, index) => (
-                                <div className="packages-history" key={index}>
-                                    <button className="packages-history-button">
-                                        <img className="truck" src="/images/delivery.png"/>
-                                        <p>Number: {pkg.number}</p>
-                                        <p>Name: {pkg.name}</p>
-                                        <p>Status: {pkg.status}</p>
-                                    </button>
-                                </div>
-                            ))
-                        ) : (
-                            <p>No packages avaible</p>
-                        )}
-                    </div>
-                )
+                return <History filteredDeliveredPackages={filteredDeliveredPackages}/>
             case "Package locker":
-                //! Paczkomat
-                const lockerLayout = [
-                    "top",
-                    "large l", "large", "large", "large", "large", "large", "large", "large r",
-                    "normal l", "normal","normal","normal", "double-small", "double-small", "normal", "normal r",
-                    "normal l", "normal","normal","normal", "double-small", "double-small", "normal", "normal r", 
-                    "normal l", "normal","normal","normal", "double-small", "double-small", "normal", "normal r", 
-                    "normal l", "normal","normal","normal", "double-small", "double-small", "normal", "normal r",
-                    "normal l", "normal", "normal", "normal","double-small","double-small", "normal", "normal r",
-                    "large ld", "large d", "large d", "large d", "large d", "large d", "large d", "large rd",
-                  ]
-                  console.log(fetchPackage)
-                  return (
-                    <div className="locker-main">
-                        <div className="locker-packages">
-                            {fetchPackage.length > 0 ? (
-                                fetchPackage.map((pkg, index) => (
-                                    <div key={index}>
-                                        <button className="packages-locker">
-                                            <img className="truck" src="/images/delivery.png"/>
-                                            <p>Number: {pkg.number}</p>
-                                            <p>Name: {pkg.name}</p>
-                                            <p>Status: {pkg.status}</p>
-                                        </button>
-                                    </div>
-                                ))
-                            ) : (
-                                <p>No packages avaible</p>
-                            )}
-                        </div>
-                        <div className="locker-grid">
-                        {lockerLayout.map((type, index) => (
-                            type === "double-small" ? (
-                            <div key={index} className="locker double-small">
-                                <div 
-                                    className="small"
-                                    onClick={() => alert(`Kliknięto szafkę numer ${index * 20 + 1}`)}
-                                ></div>
-                                <div 
-                                    className="small"
-                                    onClick={() => alert(`Kliknięto szafkę numer ${index * 20 + 2}`)}
-                                ></div>
-                            </div>
-                            ) : type === "top" ? (
-                                <div 
-                                    key={index} 
-                                    className="locker top"
-                                ></div>
-                            ) : (
-                            <div
-                                key={index}
-                                className={`locker ${type}`}
-                                onClick={() => alert(`Kliknięto szafkę numer ${index + 1}`)}
-                            ></div>
-                            )
-                        ))}
-                        </div>
-                    </div>
-                  )
+                return <PackageLocker fetchPackage={fetchPackage}/>
         }
     }
     const renderContentLongDiv = () => {
@@ -270,50 +133,13 @@ const mainPage = () => {
         <div className="body">
             <div className="gridContainer">
                 <div className="column1">
-                    <div className="mainHeader">
-                        <div className="groupLeft">
-                            <button className="menu" onClick={handleMenuClick}>
-                                <img className="menuImg" src="/images/menu-2.png"/>
-                            </button>
-                            <input
-                                type="text"
-                                className="headerInput"
-                                placeholder="Search by track number"
-                                onChange={(e) => setHeaderInput(e.target.value)}
-                            ></input>
-                        </div>
-                        <div className="groupRight">
-                            <button
-                                className="notificationButton"
-                            >
-                                <img className="bell" src="/images/notification.png"/>
-                            </button>
-                            <button
-                                className="profile"
-                                onClick={() => handleUserInfoClick()}
-                            >
-                                <img className="user" src="/images/user.png"/>
-                            </button>
-                            {userInfoVisible && (
-                                <>
-                                    <div className="arrow"></div>
-                                    <div className="userInfo">
-                                        <button 
-                                            className="buttonLogout"
-                                            onClick={() => handleLogout()}
-                                        >
-                                            Logout
-                                            <img className="logoutImg" src="/images/logout.png"/>
-                                        </button>
-                                    </div>
-                                    <div 
-                                        className="exitBigDiv"
-                                        onClick={() => handleUserInfoClick()}
-                                    ></div>
-                                </>
-                            )}
-                        </div>
-                    </div>
+                    <Header 
+                        handleLogout={handleLogout} 
+                        handleMenuClick={handleMenuClick} 
+                        handleUserInfoClick={handleUserInfoClick} 
+                        setHeaderInput={setHeaderInput} 
+                        userInfoVisible={userInfoVisible}
+                    />
                     <div className="main-2">
                         <div className="nav-main-2">
                             <button 
