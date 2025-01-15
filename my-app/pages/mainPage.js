@@ -18,6 +18,7 @@ const mainPage = () => {
     const [filteredDeliveredPackages, setFilteredDeliveredPackages] = useState([])
     const [fetchUser, setFetchUser] = useState([])
     const [deliveredPackages, setDeliveredPackages] = useState([])
+    const [longDivVisible, setLongDivVisivle] = useState(false)
     console.log(headerInput)
 
     const handleSearchInput = (e) => {
@@ -113,7 +114,7 @@ const mainPage = () => {
             case "History":
                 return <History filteredDeliveredPackages={filteredDeliveredPackages}/>
             case "Package locker":
-                return <PackageLocker fetchPackage={fetchPackage}/>
+                return <PackageLocker fetchPackage={fetchPackage} longDivVisible={longDivVisible} setLongDivVisible={setLongDivVisivle}/>
         }
     }
     const renderContentLongDiv = () => {
@@ -125,7 +126,12 @@ const mainPage = () => {
             case "History":
                 return <div className="long-div-history">Long Div History</div>
             case "Package locker":
-                return <div className="long-div">Long Div Package locker</div>
+                return (
+                        
+                            <div className="long-div">
+                                Long div Package locker
+                            </div>
+                )
         }
     }
     

@@ -459,7 +459,7 @@
 .locker-grid {
     display: grid;
     position: absolute;
-    right: 400px;
+    right: 370px;
     grid-template-columns: repeat(8, 60px); 
     background-color: transparent;
     padding: 10px;
@@ -558,4 +558,12 @@
 }
 .packages-locker:active {
     background-color: rgb(117, 216, 104)
+}
+.map {
+    height: 350px;
+    width: 270px;
+}
+.map-div {
+    margin-top: 50px;
+    margin-left: 30px;
 }

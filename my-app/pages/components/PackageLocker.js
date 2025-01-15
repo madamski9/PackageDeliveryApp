@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 
-const PackageLocker = ({ fetchPackage }) => {
+const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible }) => {
     const [lockerNum, setLockerNum] = useState(0)
     const [lockerInfo, setLockerInfo] = useState("")
     const [packageClicked, setPackageClicked] = useState(false)
@@ -10,6 +10,7 @@ const PackageLocker = ({ fetchPackage }) => {
     const [randomNumbers1, setRandomNumbers1] = useState([])
     const [randomNumbers2, setRandomNumbers2] = useState([])
     const [randomNumbers3, setRandomNumbers3] = useState([])
+    const [initialized, setInitialized] = useState(false)
     console.log(lockerNum)
 
     useEffect(() => {
@@ -20,6 +21,9 @@ const PackageLocker = ({ fetchPackage }) => {
         setRandomNumbers1(packageLocker_1)
         setRandomNumbers2(packageLocker_2)
         setRandomNumbers3(packageLocker_3)
+        const occupied = JSON.parse(sessionStorage.getItem("occupiedLockers")) || []
+        setOccupiedLockers(occupied)
+        setInitialized(true)
     }, [])
 
     useEffect(() => {
@@ -32,6 +36,7 @@ const PackageLocker = ({ fetchPackage }) => {
         setLockerNum(e)
         setLockerInfo("Choose locker you want package to be delivered to")
         setPackageClicked(true)
+        setLongDivVisible(!longDivVisible)
     }
 
     const handleLockerClick = (idx) => {
@@ -58,7 +63,7 @@ const PackageLocker = ({ fetchPackage }) => {
 
     const getLockerStyle = (index) => {
         const currentRandomNumbers = lockerNum === 1 ? randomNumbers1 : lockerNum === 2 ? randomNumbers2 : randomNumbers3
-        if (currentRandomNumbers[index] === 0 || currentRandomNumbers[index * lockerNum] < 0.3) {
+        if (currentRandomNumbers[index] === 0 || currentRandomNumbers[index] < 0.3 || occupiedLockers.includes(index)) {
             return { backgroundColor: 'red', cursor: 'default' }
         }
         if (index === selectedLocker) {
@@ -67,18 +72,18 @@ const PackageLocker = ({ fetchPackage }) => {
         return packageClicked ? null : { cursor: 'default' }
     }
 
-    useState(() => {
+    useEffect(() => {
         setLockerInfo("Choose package")
     }, [])
 
     const lockerLayout = [
         "top",
         "large l", "large", "large", "large", "large", "large", "large", "large r",
-        "normal l", "normal", "normal", "normal", "double-small", "double-small", "normal", "normal r",
-        "normal l", "normal", "normal", "normal", "double-small", "double-small", "normal", "normal r", 
-        "normal l", "normal", "normal", "normal", "double-small", "double-small", "normal", "normal r", 
-        "normal l", "normal", "normal", "normal", "double-small", "double-small", "normal", "normal r",
-        "normal l", "normal", "normal", "normal", "double-small", "double-small", "normal", "normal r",
+        "normal l", "normal", "normal", "normal", "normal", "normal", "normal", "normal r",
+        "normal l", "normal", "normal", "normal", "normal", "normal", "normal", "normal r", 
+        "normal l", "normal", "normal", "normal", "normal", "normal", "normal", "normal r", 
+        "normal l", "normal", "normal", "normal", "normal", "normal", "normal", "normal r",
+        "normal l", "normal", "normal", "normal", "normal", "normal", "normal", "normal r",
         "large ld", "large d", "large d", "large d", "large d", "large d", "large d", "large rd",
     ]
 
@@ -106,20 +111,7 @@ const PackageLocker = ({ fetchPackage }) => {
             <div>{lockerInfo}</div>
             <div className="locker-grid">
                 {lockerLayout.map((type, index) => (
-                    type === "double-small" ? (
-                        <div key={index} className="locker double-small">
-                            <div
-                                className="small"
-                                style={getLockerStyle(index * 2)}
-                                onClick={() => handleLockerClick(index * 2)}
-                            ></div>
-                            <div
-                                className="small"
-                                style={getLockerStyle(index * 2 + 1)} 
-                                onClick={() => handleLockerClick(index * 2 + 1)}
-                            ></div>
-                        </div>
-                    ) : type === "top" ? (
+                    type === "top" ? (
                         <div key={index} className="locker top"></div>
                     ) : (
                         <div
