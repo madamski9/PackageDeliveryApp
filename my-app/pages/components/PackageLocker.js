@@ -1,29 +1,98 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+
 const PackageLocker = ({ fetchPackage }) => {
-    const randomNumbers = JSON.parse(localStorage.getItem("random"))
     const [lockerNum, setLockerNum] = useState(0)
+    const [lockerInfo, setLockerInfo] = useState("")
+    const [packageClicked, setPackageClicked] = useState(false)
+    const [selectedLocker, setSelectedLocker] = useState(null)
+    const [confirmVisible, setConfirmVisible] = useState(false)
+    const [occupiedLockers, setOccupiedLockers] = useState([])
+    const [randomNumbers1, setRandomNumbers1] = useState([])
+    const [randomNumbers2, setRandomNumbers2] = useState([])
+    const [randomNumbers3, setRandomNumbers3] = useState([])
+    console.log(lockerNum)
+
+    useEffect(() => {
+        const packageLocker_1 = JSON.parse(sessionStorage.getItem("random_1")) || Array.from({ length: 70 }, () => Math.random())
+        const packageLocker_2 = JSON.parse(sessionStorage.getItem("random_2")) || Array.from({ length: 70 }, () => Math.random())
+        const packageLocker_3 = JSON.parse(sessionStorage.getItem("random_3")) || Array.from({ length: 70 }, () => Math.random())
+
+        setRandomNumbers1(packageLocker_1)
+        setRandomNumbers2(packageLocker_2)
+        setRandomNumbers3(packageLocker_3)
+    }, [])
+
+    useEffect(() => {
+        sessionStorage.setItem("random_1", JSON.stringify(randomNumbers1))
+        sessionStorage.setItem("random_2", JSON.stringify(randomNumbers2))
+        sessionStorage.setItem("random_3", JSON.stringify(randomNumbers3))
+    }, [randomNumbers1, randomNumbers2, randomNumbers3])
+
+    const handlePackageClick = (e, num) => {
+        setLockerNum(e)
+        setLockerInfo("Choose locker you want package to be delivered to")
+        setPackageClicked(true)
+    }
+
+    const handleLockerClick = (idx) => {
+        if (occupiedLockers.includes(idx)) return //* Szafka zajęta
+
+        const result = confirm(`Are you sure you want locker number ${idx}?`)
+        if (result) {
+            setSelectedLocker(idx)
+            setConfirmVisible(true)
+        }
+    }
+
+    const handleConfirmSelection = () => {
+        const updatedNumbers = lockerNum === 1 ? [...randomNumbers1] : lockerNum === 2 ? [...randomNumbers2] : [...randomNumbers3]
+        updatedNumbers[selectedLocker] = 0
+
+        if (lockerNum === 1) setRandomNumbers1(updatedNumbers)
+        if (lockerNum === 2) setRandomNumbers2(updatedNumbers)
+        if (lockerNum === 3) setRandomNumbers3(updatedNumbers)
+
+        setConfirmVisible(false)
+        setSelectedLocker(null)
+    }
+
+    const getLockerStyle = (index) => {
+        const currentRandomNumbers = lockerNum === 1 ? randomNumbers1 : lockerNum === 2 ? randomNumbers2 : randomNumbers3
+        if (currentRandomNumbers[index] === 0 || currentRandomNumbers[index * lockerNum] < 0.3) {
+            return { backgroundColor: 'red', cursor: 'default' }
+        }
+        if (index === selectedLocker) {
+            return { backgroundColor: 'green', cursor: 'pointer' }
+        }
+        return packageClicked ? null : { cursor: 'default' }
+    }
+
+    useState(() => {
+        setLockerInfo("Choose package")
+    }, [])
+
     const lockerLayout = [
         "top",
         "large l", "large", "large", "large", "large", "large", "large", "large r",
-        "normal l", "normal","normal","normal", "double-small", "double-small", "normal", "normal r",
-        "normal l", "normal","normal","normal", "double-small", "double-small", "normal", "normal r", 
-        "normal l", "normal","normal","normal", "double-small", "double-small", "normal", "normal r", 
-        "normal l", "normal","normal","normal", "double-small", "double-small", "normal", "normal r",
-        "normal l", "normal", "normal", "normal","double-small","double-small", "normal", "normal r",
+        "normal l", "normal", "normal", "normal", "double-small", "double-small", "normal", "normal r",
+        "normal l", "normal", "normal", "normal", "double-small", "double-small", "normal", "normal r", 
+        "normal l", "normal", "normal", "normal", "double-small", "double-small", "normal", "normal r", 
+        "normal l", "normal", "normal", "normal", "double-small", "double-small", "normal", "normal r",
+        "normal l", "normal", "normal", "normal", "double-small", "double-small", "normal", "normal r",
         "large ld", "large d", "large d", "large d", "large d", "large d", "large d", "large rd",
     ]
-    console.log(fetchPackage)
+
     return (
         <div className="locker-main">
             <div className="locker-packages">
                 {fetchPackage.length > 0 ? (
                     fetchPackage.map((pkg, index) => (
                         <div key={index}>
-                            <button 
+                            <button
                                 className="packages-locker"
-                                onClick={() => setLockerNum(parseInt(pkg.packagelocker), 10)}
+                                onClick={() => handlePackageClick(parseInt(pkg.packagelocker), pkg.number)}
                             >
-                                <img className="truck" src="/images/delivery.png"/>
+                                <img className="truck" src="/images/delivery.png" />
                                 <p>Number: {pkg.number}</p>
                                 <p>Name: {pkg.name}</p>
                                 <p>Status: {pkg.status}</p>
@@ -31,38 +100,41 @@ const PackageLocker = ({ fetchPackage }) => {
                         </div>
                     ))
                 ) : (
-                    <p>No packages avaible</p>
+                    <p>No packages available</p>
                 )}
             </div>
+            <div>{lockerInfo}</div>
             <div className="locker-grid">
-            {lockerLayout.map((type, index) => (
-                type === "double-small" ? (
-                <div key={index} className="locker double-small">
-                    <div 
-                        className="small"
-                        style={randomNumbers[index * lockerNum + 2] < 0.3 ? {backgroundColor: 'red', cursor: 'default'} : null}
-                        onClick={randomNumbers[index * lockerNum + 2] < 0.3 ? null : () => alert(`Kliknięto szafkę numer ${index + 1}`)}
-                    ></div>
-                    <div 
-                        className="small"
-                        style={randomNumbers[index * lockerNum + 1] < 0.3 ? {backgroundColor: 'red', cursor: 'default'} : null}
-                        onClick={randomNumbers[index * lockerNum + 1] < 0.3 ? null : () => alert(`Kliknięto szafkę numer ${index + 1.5}`)}
-                    ></div>
-                </div>
-                ) : type === "top" ? (
-                    <div 
-                        key={index} 
-                        className="locker top"
-                    ></div>
-                ) : (
-                <div
-                    key={index}
-                    className={`locker ${type}`}
-                    style={randomNumbers[index * lockerNum + 1] < 0.3 ? {backgroundColor: 'red', cursor: 'default'} : null}
-                    onClick={randomNumbers[index * lockerNum + 1] < 0.3 ? null : () => alert(`Kliknięto szafkę numer ${index + 1}`)}
-                ></div>
-                )
-            ))}
+                {lockerLayout.map((type, index) => (
+                    type === "double-small" ? (
+                        <div key={index} className="locker double-small">
+                            <div
+                                className="small"
+                                style={getLockerStyle(index * 2)}
+                                onClick={() => handleLockerClick(index * 2)}
+                            ></div>
+                            <div
+                                className="small"
+                                style={getLockerStyle(index * 2 + 1)} 
+                                onClick={() => handleLockerClick(index * 2 + 1)}
+                            ></div>
+                        </div>
+                    ) : type === "top" ? (
+                        <div key={index} className="locker top"></div>
+                    ) : (
+                        <div
+                            key={index}
+                            className={`locker ${type}`}
+                            style={getLockerStyle(index)}
+                            onClick={() => handleLockerClick(index)}
+                        ></div>
+                    )
+                ))}
+                {confirmVisible && (
+                    <button onClick={handleConfirmSelection} className="confirm-button">
+                        Confirm Selection
+                    </button>
+                )}
             </div>
         </div>
     )
