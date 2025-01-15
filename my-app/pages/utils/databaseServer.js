@@ -26,6 +26,7 @@ const options = {
   key: fs.readFileSync('../../certificates/localhost.key'),
   cert: fs.readFileSync('../../certificates/localhost.crt'),
 };
+app.server = https.createServer(options, app)
 
 export const pool = new Pool({
   user: 'macciek',
@@ -92,7 +93,7 @@ app.post('/home', async (req, res) => {
       res.setHeader("Set-Cookie", cookie.serialize("token", token, {
         httpOnly: true,
         secure: true,
-        maxAge: 60 * 60,
+        maxAge: 120 * 60,
         sameSite: "strict",
         path: "/"
       }))
@@ -163,7 +164,7 @@ const updatePackageStatus = async () => {
     console.error("Error updating package status:", error)
   }
 }
-setInterval(updatePackageStatus, 30 * 60 * 1000) //* co pol godziny
+setInterval(updatePackageStatus, 120 * 60 * 1000) //* co pol godziny
 
 app.get("/api/getPackage", async (req, res) => {
   const { userId } = req.query
@@ -194,7 +195,28 @@ app.get("/api/getUserData", async (req, res) => {
     res.status(500).send("error fetching user data")
   }
 })
+app.delete("/api/deletePackage", async (req, res) => {
+  const { number } = req.body
+  try {
+    const client = await pool.connect()
+    const result = await client.query('DELETE FROM public.packages WHERE number = $1 RETURNING *',
+      [number]
+    )
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Package not found" });
+    }
+    console.log("Deleted package number: ", result.rows)
+    client.release()
+    res.status(200).json({
+      message: `Package number ${number} deleted successfully`,
+      deletedPackage: result.rows[0]
+    })
+  } catch (error) {
+    console.error("Error deleting package:", error)
+    res.status(500).send("error deleting package")
+  }
+})
 
-https.createServer(options, app).listen(3001, () => {
+app.server.listen(3001, () => {
   console.log('API server running on https://localhost:3001');
 });

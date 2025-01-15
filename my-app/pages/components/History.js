@@ -1,10 +1,13 @@
-const History = ({ filteredDeliveredPackages,  }) => {
+const History = ({ filteredDeliveredPackages, handlePackageSelection}) => {
     return (
         <div className="history-div">
             {filteredDeliveredPackages.length > 0 ? (
                 filteredDeliveredPackages.map((pkg, index) => (
                     <div className="packages-history" key={index}>
-                        <button className="packages-history-button">
+                        <button 
+                            className="packages-history-button"
+                            onClick={() => handlePackageSelection(pkg)}
+                        >
                             <img className="truck" src="/images/delivery.png"/>
                             <p>Number: {pkg.number}</p>
                             <p>Name: {pkg.name}</p>

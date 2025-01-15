@@ -207,7 +207,6 @@
     gap: 20px;
     height: 100%; 
     margin-left: 20px;
-    margin-right: 20px;
 }
 .column1 {
     display: flex;
@@ -539,9 +538,10 @@
     display: flex;
     border: none;
     background-color: rgb(141, 254, 127);
-    height: 40px;
-    min-width: 71%;
-    max-width: 71%;
+    min-width: 95%;
+    max-width: 95%;
+    min-height: 50%;
+    max-height: 50%;
     align-items: center;
     margin-bottom: 9px;
     border-radius: 30px;
@@ -559,11 +559,94 @@
 .packages-locker:active {
     background-color: rgb(117, 216, 104)
 }
+.map-div {
+    height: 100vh;
+    width: 326px;
+    background-color: rgb(255, 255, 255);
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
 .map {
     height: 350px;
     width: 270px;
-}
-.map-div {
-    margin-top: 50px;
+    margin-top: 100px;
     margin-left: 30px;
+    border-radius: 20px;
+}
+.locker-info {
+    position: absolute;
+    left: 756px;
+    width: 250px;
+}
+.modal {
+    position: absolute;
+    left: -550px;
+    top: -100px;
+    height: 670px;
+    width: 520px;
+    background-color: transparent;
+}
+.locker-grid-main {
+    height: 680px;
+    width: 650px;
+    background-color: transparent;
+}
+.pl1-img, .pl2-img, .pl3-img {
+    height: 20px;
+    width: 20px;
+}
+.arrow-pl1, .arrow-pl2, .arrow-pl3 {
+    position: absolute;
+    display: flex;
+    height: 10px;
+    width: 10px;
+    top: -8px;
+    background-color: rgb(93, 93, 93);
+    clip-path: polygon(50% 10%, 0% 100%, 100% 100%);
+}
+
+.pl1, .pl2, .pl3 {
+    position: absolute;
+    display: flex;
+    height: 30px;
+    width: 30px;
+    background-color: rgb(93, 93, 93);
+    justify-content: center;
+    align-items: center;
+    border-radius: 23px;
+    cursor: pointer;
+}
+.pl1:hover, .pl2:hover, .pl3:hover {
+    background-color: rgb(72, 72, 72)
+}
+.pl1 {
+    top: 300px;
+    right: 200px;
+}
+.pl2 {
+    top: 200px;
+    right: 100px;
+}
+.pl3 {
+    top: 400px;
+    right: 70px;
+}
+.trash {
+    margin-left: 600px;
+    height: 30px;
+    width: 40px;
+    background-color: transparent;
+}
+.div-over {
+    display: flex;
+    justify-content: space-between;
+}
+.truck {
+    margin-top: 20px;
+}
+.trash-img {
+    height: 25px;
+    width: 25px;
+    margin-top: 3px;
+    margin-right: 5px;
 }

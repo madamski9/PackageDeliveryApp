@@ -1,6 +1,31 @@
 import { useRouter } from "next/router"
-const Overview = ({ fetchUser, filteredPackages, }) => {
+const Overview = ({ fetchUser, filteredPackages, handlePackageSelection}) => {
     const router = useRouter()
+    const handleTrashClick = (e, num) => {
+        e.stopPropagation()
+        const result = confirm("Are you sure you want to delete this package?")
+        if (result) {
+            fetchDeletePackages(num)
+        }
+    }
+    const fetchDeletePackages = async (number) => {
+        try {
+            const result = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/deletePackage`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ number})
+            })
+            if (!result.ok) {
+                throw new Error("Failed to delete package");
+            }
+
+            const data = await result.json()
+            console.log(data)
+            window.location.reload()
+        } catch (error) {
+            console.error("error deleting package: ", error)
+        }
+    }
     return (
         <div className="overview-grid">
             <div className="overview-main-1">
@@ -39,11 +64,19 @@ const Overview = ({ fetchUser, filteredPackages, }) => {
                     {filteredPackages.length > 0 ? (
                         filteredPackages.map((pkg, index) => (
                             <div key={index}>
-                                <button className="packages-overview">
-                                    <img className="truck" src="/images/delivery.png"/>
-                                    <p>Number: {pkg.number}</p>
-                                    <p>Name: {pkg.name}</p>
-                                    <p>Status: {pkg.status}</p>
+                                <button 
+                                    className="packages-overview"
+                                    onClick={() => handlePackageSelection(pkg)}
+                                >
+                                    <div className="div-over">
+                                        <img className="truck" src="/images/delivery.png"/>
+                                        <p>Number: {pkg.number}</p>
+                                        <p>Name: {pkg.name}</p>
+                                    </div>
+                                    <div 
+                                        className="trash"
+                                        onClick={(e) => handleTrashClick(e, pkg.number)}
+                                    ><img className="trash-img" src="/images/trash.png"/></div>
                                 </button>
                             </div>
                         ))

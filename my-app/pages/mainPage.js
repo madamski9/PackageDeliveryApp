@@ -6,6 +6,7 @@ import Overview from "./components/Overview.js";
 import History from "./components/History.js";
 import PackageLocker from "./components/PackageLocker.js";
 import Header from "./components/Header.js";
+import Map from "./components/Map.js";
 
 const mainPage = () => {
     const router = useRouter()
@@ -19,8 +20,12 @@ const mainPage = () => {
     const [fetchUser, setFetchUser] = useState([])
     const [deliveredPackages, setDeliveredPackages] = useState([])
     const [longDivVisible, setLongDivVisivle] = useState(false)
+    const [selectedPackages, setSelectedPackages] = useState(null)
     console.log(headerInput)
 
+    const handlePackageSelection = (pkg) => {
+        setSelectedPackages(pkg);
+    }
     const handleSearchInput = (e) => {
         if (activePage === "Overview") {
             setFilteredPackages(e === "" ? fetchPackage : fetchPackage.filter(paczka => paczka.number.startsWith(e)))
@@ -60,7 +65,7 @@ const mainPage = () => {
             })
             if (response.ok) {
                 const data = await response.json()
-                console.log(data)
+                console.log("potrzbuje to", data)
                 const delivered = data.filter(pkg => pkg.status === "Delivered")
                 const notDelivered = data.filter(pkg => pkg.status !== "Delivered")
 
@@ -110,28 +115,21 @@ const mainPage = () => {
         renderContentLongDiv()
         switch (activePage) {
             case "Overview":
-                return <Overview fetchUser={fetchUser} filteredPackages={filteredPackages}/>
+                return <Overview fetchUser={fetchUser} filteredPackages={filteredPackages} handlePackageSelection={handlePackageSelection}/>
             case "History":
-                return <History filteredDeliveredPackages={filteredDeliveredPackages}/>
+                return <History filteredDeliveredPackages={filteredDeliveredPackages} handlePackageSelection={handlePackageSelection}/>
             case "Package locker":
-                return <PackageLocker fetchPackage={fetchPackage} longDivVisible={longDivVisible} setLongDivVisible={setLongDivVisivle}/>
+                return <PackageLocker fetchPackage={fetchPackage} longDivVisible={longDivVisible} setLongDivVisible={setLongDivVisivle} handlePackageSelection={handlePackageSelection}/>
         }
     }
     const renderContentLongDiv = () => {
         switch (activePage) {
             case "Overview":
-                return (
-                    <div className="long-div-overview">Long Div Overview</div>
-                )
+                return <Map selectedPackages={selectedPackages}/>
             case "History":
-                return <div className="long-div-history">Long Div History</div>
+                return <Map selectedPackages={selectedPackages}/>
             case "Package locker":
-                return (
-                        
-                            <div className="long-div">
-                                Long div Package locker
-                            </div>
-                )
+                return <Map selectedPackages={selectedPackages}/>
         }
     }
     

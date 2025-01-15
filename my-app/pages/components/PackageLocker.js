@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 
-const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible }) => {
+const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible, handlePackageSelection }) => {
     const [lockerNum, setLockerNum] = useState(0)
     const [lockerInfo, setLockerInfo] = useState("")
     const [packageClicked, setPackageClicked] = useState(false)
@@ -10,27 +10,6 @@ const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible }) => {
     const [randomNumbers1, setRandomNumbers1] = useState([])
     const [randomNumbers2, setRandomNumbers2] = useState([])
     const [randomNumbers3, setRandomNumbers3] = useState([])
-    const [initialized, setInitialized] = useState(false)
-    console.log(lockerNum)
-
-    useEffect(() => {
-        const packageLocker_1 = JSON.parse(sessionStorage.getItem("random_1")) || Array.from({ length: 70 }, () => Math.random())
-        const packageLocker_2 = JSON.parse(sessionStorage.getItem("random_2")) || Array.from({ length: 70 }, () => Math.random())
-        const packageLocker_3 = JSON.parse(sessionStorage.getItem("random_3")) || Array.from({ length: 70 }, () => Math.random())
-
-        setRandomNumbers1(packageLocker_1)
-        setRandomNumbers2(packageLocker_2)
-        setRandomNumbers3(packageLocker_3)
-        const occupied = JSON.parse(sessionStorage.getItem("occupiedLockers")) || []
-        setOccupiedLockers(occupied)
-        setInitialized(true)
-    }, [])
-
-    useEffect(() => {
-        sessionStorage.setItem("random_1", JSON.stringify(randomNumbers1))
-        sessionStorage.setItem("random_2", JSON.stringify(randomNumbers2))
-        sessionStorage.setItem("random_3", JSON.stringify(randomNumbers3))
-    }, [randomNumbers1, randomNumbers2, randomNumbers3])
 
     const handlePackageClick = (e, num) => {
         setLockerNum(e)
@@ -76,6 +55,25 @@ const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible }) => {
         setLockerInfo("Choose package")
     }, [])
 
+    useEffect(() => {
+        const packageLocker_1 = JSON.parse(sessionStorage.getItem("random_1")) || Array.from({ length: 70 }, () => Math.random())
+        const packageLocker_2 = JSON.parse(sessionStorage.getItem("random_2")) || Array.from({ length: 70 }, () => Math.random())
+        const packageLocker_3 = JSON.parse(sessionStorage.getItem("random_3")) || Array.from({ length: 70 }, () => Math.random())
+
+        setRandomNumbers1(packageLocker_1)
+        setRandomNumbers2(packageLocker_2)
+        setRandomNumbers3(packageLocker_3)
+        const occupied = JSON.parse(sessionStorage.getItem("occupiedLockers")) || []
+        setOccupiedLockers(occupied)
+    }, [])
+
+    useEffect(() => {
+        sessionStorage.setItem("random_1", JSON.stringify(randomNumbers1))
+        sessionStorage.setItem("random_2", JSON.stringify(randomNumbers2))
+        sessionStorage.setItem("random_3", JSON.stringify(randomNumbers3))
+    }, [randomNumbers1, randomNumbers2, randomNumbers3])
+
+
     const lockerLayout = [
         "top",
         "large l", "large", "large", "large", "large", "large", "large", "large r",
@@ -90,12 +88,17 @@ const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible }) => {
     return (
         <div className="locker-main">
             <div className="locker-packages">
+                <div>
+                    Packages to choose locker:
+                </div>
                 {fetchPackage.length > 0 ? (
                     fetchPackage.map((pkg, index) => (
                         <div key={index}>
                             <button
                                 className="packages-locker"
-                                onClick={() => handlePackageClick(parseInt(pkg.packagelocker), pkg.number)}
+                                onClick={() => {
+                                    handlePackageSelection(pkg)
+                                    handlePackageClick(parseInt(pkg.packagelocker), pkg.number)}}
                             >
                                 <img className="truck" src="/images/delivery.png" />
                                 <p>Number: {pkg.number}</p>
@@ -108,26 +111,43 @@ const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible }) => {
                     <p>No packages available</p>
                 )}
             </div>
-            <div>{lockerInfo}</div>
-            <div className="locker-grid">
-                {lockerLayout.map((type, index) => (
-                    type === "top" ? (
-                        <div key={index} className="locker top"></div>
-                    ) : (
-                        <div
-                            key={index}
-                            className={`locker ${type}`}
-                            style={getLockerStyle(index)}
-                            onClick={() => handleLockerClick(index)}
-                        ></div>
-                    )
-                ))}
-                {confirmVisible && (
-                    <button onClick={handleConfirmSelection} className="confirm-button">
-                        Confirm Selection
-                    </button>
+            <div className="locker-packages-chosen">
+                
+            </div>
+            <div className="locker-info">
+                {lockerInfo}
+                {lockerNum > 0 ? (
+                    <p>Package locker number: {lockerNum}</p>
+                ) : (
+                    <p></p>
                 )}
             </div>
+            {packageClicked && (
+                <div className="locker-grid-main">
+                    <div className="locker-grid">
+                        {lockerLayout.map((type, index) => (
+                            type === "top" ? (
+                                <div key={index} className="locker top"></div>
+                            ) : (
+                                <div
+                                    key={index}
+                                    className={`locker ${type}`}
+                                    style={getLockerStyle(index)}
+                                    onClick={() => handleLockerClick(index)}
+                                ></div>
+                            )
+                        ))}
+                        {confirmVisible && (
+                            <>
+                                <div className="modal"></div>
+                                <button onClick={handleConfirmSelection} className="confirm-button">
+                                    Confirm Selection
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
