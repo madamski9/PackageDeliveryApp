@@ -650,3 +650,17 @@
     margin-top: 3px;
     margin-right: 5px;
 }
+.notification-div {
+    position: absolute;
+    height: 100px;
+    width: 300px;
+    margin-top: 50px;
+    background-color: red;
+}
+.notificationMsg {
+    color: white;
+    font-size: 10px;
+}
+.notificationNum {
+    color: black;
+}

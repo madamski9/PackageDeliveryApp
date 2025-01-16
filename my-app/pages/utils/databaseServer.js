@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import bcrypt from 'bcrypt'
 import cookie from "cookie"
+import mqtt from 'mqtt'
 import jwt from "jsonwebtoken"
 import fs from 'fs'
 import https from 'https'
@@ -21,6 +22,43 @@ app.use(cors({
   credentials: true, 
 }))
 app.use(cookieParser())
+
+//! MQTT
+const clientMqtt = mqtt.connect('wss://localhost:9001', {
+  rejectUnauthorized: false, 
+})
+const MQTT_TOPIC = "/package/delivered"
+
+clientMqtt.on("connect", () => {
+    console.log("Connected to MQTT broker")
+    clientMqtt.subscribe(MQTT_TOPIC)
+})
+clientMqtt.on("message", (topic, message) => {
+    if (topic === MQTT_TOPIC) {
+        console.log("Received: ", message.toString())
+    }
+})
+clientMqtt.on("error", (error) => {
+    console.error("mqtt error: ", error)
+})
+
+app.post("/mqtt/publish", (req, res) => {
+    const { topic, message } = req.body
+
+    if (!topic || !message) {
+        return res.status(400).json({ error: 'Brak tematu lub wiadomości w żądaniu' })
+    }
+    
+    clientMqtt.publish(topic, message, (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Błąd podczas publikowania wiadomości' })
+        }
+        console.log(`Wiadomość opublikowana na temacie ${topic}: ${message}`)
+        res.status(200).json({ message: 'Wiadomość opublikowana pomyślnie' })
+    })
+})
+
+//! DATABASE API
 
 const options = {
   key: fs.readFileSync('../../certificates/localhost.key'),
@@ -143,10 +181,17 @@ app.post("/api/addPackage", async (req, res) => {
   }
 })
 const statusSequence = ["Sent", "Accepted for execution", "On the way", "Delivered"]
+// const clientMqtt = mqtt.connect('mqtt://localhost:1883')
+clientMqtt.on('connect', () => {
+  console.log('Połączono z brokerem MQTT');
+})
+clientMqtt.on('error', (error) => {
+  console.error('Błąd połączenia z brokerem MQTT:', error);
+})
 const updatePackageStatus = async () => {
   try {
     const client = await pool.connect()
-    const result = await client.query(`SELECT id, status FROM public.packages WHERE status != 'Delivered'`)
+    const result = await client.query(`SELECT id, status, number FROM public.packages WHERE status != 'Delivered'`)
     console.log(result.rows)
     for (let packages of result.rows) {
       const currIdx = statusSequence.indexOf(packages.status) 
@@ -157,6 +202,18 @@ const updatePackageStatus = async () => {
           [newStatus, packages.id]
         )
         console.log(`Updated package ${packages.id} to status: ${newStatus}`)
+
+        if (newStatus === "Delivered") {
+          clientMqtt.publish("/package/delivered", JSON.stringify({
+            message: `Package number ${packages.number} is delivered!`,
+          }), (err) => {
+            if (err) {
+              console.error('Błąd podczas publikowania dostarczenia paczki:', err);
+            } else {
+              console.log(`Paczka ${packages.id} została dostarczona!`);
+            }
+          })
+        }
       }
     }
     client.release()
@@ -164,7 +221,7 @@ const updatePackageStatus = async () => {
     console.error("Error updating package status:", error)
   }
 }
-setInterval(updatePackageStatus, 120 * 60 * 1000) //* co pol godziny
+setInterval(updatePackageStatus,  10 * 1000) //* co pol godziny
 
 app.get("/api/getPackage", async (req, res) => {
   const { userId } = req.query

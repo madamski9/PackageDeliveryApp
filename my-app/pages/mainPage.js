@@ -1,12 +1,12 @@
-import { useState, useEffect, act } from "react";
-import { useRouter } from "next/router";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, act } from "react"
+import { useRouter } from "next/router"
 import "./components/Overview.js"
-import Overview from "./components/Overview.js";
-import History from "./components/History.js";
-import PackageLocker from "./components/PackageLocker.js";
-import Header from "./components/Header.js";
-import Map from "./components/Map.js";
+import Overview from "./components/Overview.js"
+import History from "./components/History.js"
+import PackageLocker from "./components/PackageLocker.js"
+import Header from "./components/Header.js"
+import Map from "./components/Map.js"
+import mqtt from 'mqtt'
 
 const mainPage = () => {
     const router = useRouter()
@@ -21,10 +21,62 @@ const mainPage = () => {
     const [deliveredPackages, setDeliveredPackages] = useState([])
     const [longDivVisible, setLongDivVisivle] = useState(false)
     const [selectedPackages, setSelectedPackages] = useState(null)
-    console.log(headerInput)
+    const [messages, setMessages] = useState([])
+    
+    useEffect(() => {
+        const client = mqtt.connect('wss://localhost:9001')
+
+        client.on('connect', () => {
+            console.log('Połączono z brokerem MQTT')
+            
+            client.subscribe('lockers/package/+/delivered', (err) => {
+                if (err) {
+                    console.log('Błąd subskrypcji:', err)
+                } else {
+                    console.log('Subskrybowano temat')
+                }
+            })
+        })
+
+        client.on('message', async (topic, message) => {
+            const msg = JSON.parse(message.toString())
+            console.log(`Otrzymano wiadomość na temat ${topic}:`, msg)
+        
+            if (topic === 'lockers/package/+/delivered') {
+                try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/updatePackageStatus`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ packageId: msg.packageId, status: msg.status })
+                    })
+                    if (response.ok) {
+                        console.log(`Status paczki zaktualizowany na: ${msg.status}`)
+                    }
+                } catch (error) {
+                    console.error('Błąd aktualizacji statusu paczki w bazie danych:', error)
+                }
+            }
+        
+            setMessages((prevMessages) => [...prevMessages, msg])
+        })
+
+        return () => {
+            client.end()
+        }
+    }, [])
+
+    const handleNewNotification = (message) => {
+        console.log('Powiadomienie:', message)
+    }
+
+    useEffect(() => {
+        messages.forEach((message) => {
+            handleNewNotification(message)
+        })
+    }, [messages])
 
     const handlePackageSelection = (pkg) => {
-        setSelectedPackages(pkg);
+        setSelectedPackages(pkg)
     }
     const handleSearchInput = (e) => {
         if (activePage === "Overview") {
@@ -42,16 +94,16 @@ const mainPage = () => {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 credentials: 'include',  
-            });
+            })
             if (response.ok) {
-                console.log("Logged out successfully");
-                localStorage.removeItem("userId");
-                router.push("/?path=home"); 
+                console.log("Logged out successfully")
+                localStorage.removeItem("userId")
+                router.push("/?path=home") 
             } else {
-                console.error("Logout failed");
+                console.error("Logout failed")
             }
         } catch (error) {
-            console.error("Error logging out:", error);
+            console.error("Error logging out:", error)
         }
     }
 
