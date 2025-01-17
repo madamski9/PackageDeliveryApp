@@ -1,10 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Notifications from "./Notifications.js";
+import mqtt from "mqtt";
 
 const Header = ({ handleLogout, handleMenuClick, handleUserInfoClick, setHeaderInput, userInfoVisible }) => {
     const [notificationVisible, setNotificationVisible] = useState(false);
     const [notificationNumber, setNotificationNumber] = useState(0)
     console.log("notificationNumber: ", notificationNumber)
+
+    const handleRemoveClick = () => {
+        localStorage.removeItem("messages")
+        setNotificationNumber(0)
+    }
+    useEffect(() => {
+        const client = mqtt.connect(process.env.NEXT_PUBLIC_MQTT_BROKER_URL)
+
+        client.on("connect", () => {
+            console.log("Header connected to MQTT")
+            client.subscribe(process.env.NEXT_PUBLIC_MQTT_TOPIC, (err) => {
+                if (!err) {
+                    console.log(`header subscribing ${process.env.NEXT_PUBLIC_MQTT_TOPIC}`)
+                }
+            })
+        })
+        client.on("message", (topic, msg) => {
+            if (msg) {
+                setNotificationNumber(prevNum => prevNum + 1)
+            }
+            console.log("liczba: ", notificationNumber)
+        })
+    }, [])
 
     return (
         <div className="mainHeader">
@@ -20,22 +44,34 @@ const Header = ({ handleLogout, handleMenuClick, handleUserInfoClick, setHeaderI
                 />
             </div>
             <div className="groupRight">
-                {notificationNumber > 0 ? (
-                    <div className="notificationNum">
-                        {notificationNumber}
-                    </div>
-                ) : (
-                    null
-                )}
+                    {notificationNumber > 0 ? (
+                        <div className="notificationNum">
+                            <div style={{color: 'white', marginLeft: '4.5px', fontSize: '12px'}}>{notificationNumber}</div>
+                        </div>
+                    ) : (
+                        <div style={{display: 'none'}}>{notificationNumber}</div>
+                    )}
                 <button
                     className="notificationButton"
                     onClick={() => setNotificationVisible(!notificationVisible)}
                 >
                 <img className="bell" src="/images/notification.png" />
                 </button>
+                <div className="transparent-div">
+                    <Notifications setNotificationNumber={setNotificationNumber} />
+                </div>
                 {notificationVisible && (
                     <div className="notification-div">
                         <Notifications setNotificationNumber={setNotificationNumber} />
+                        {notificationNumber > 0 ? (
+                            <button
+                                onClick={() => handleRemoveClick()}
+                            >
+                                wyczysc
+                            </button>
+                        ) : (
+                            <p>You dont have any notifications</p>
+                        )}
                     </div>
                 )}
                 <button

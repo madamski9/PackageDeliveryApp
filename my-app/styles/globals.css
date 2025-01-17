@@ -662,5 +662,15 @@
     font-size: 10px;
 }
 .notificationNum {
-    color: black;
+    position: absolute;
+    background-color: red;
+    height: 15px;
+    min-width: 13px;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    left: 1030px;
+}
+.transparent-div {
+    display: none;
 }
