@@ -31,86 +31,76 @@ const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible, handle
     }
 
     const handleConfirmSelection = async (idx) => {
-        const updatedNumbers = lockerNum === 1 ? [...randomNumbers1] : lockerNum === 2 ? [...randomNumbers2] : [...randomNumbers3]
-        updatedNumbers[selectedLocker] = 0
+        const updatedNumbers = lockerNum === 1 ? [...randomNumbers1] : lockerNum === 2 ? [...randomNumbers2] : [...randomNumbers3];
+        updatedNumbers[selectedLocker] = 0;
     
-        if (lockerNum === 1) setRandomNumbers1(updatedNumbers)
-        if (lockerNum === 2) setRandomNumbers2(updatedNumbers)
-        if (lockerNum === 3) setRandomNumbers3(updatedNumbers)
+        if (lockerNum === 1) setRandomNumbers1(updatedNumbers);
+        if (lockerNum === 2) setRandomNumbers2(updatedNumbers);
+        if (lockerNum === 3) setRandomNumbers3(updatedNumbers);
     
-        setConfirmVisible(false)
-        setSelectedLocker(null)
+        setConfirmVisible(false);
+        setSelectedLocker(null);
         setOccupiedLockers(prevOccupied => {
-            const updatedOccupied = [...prevOccupied, idx]
-            sessionStorage.setItem("occupiedLockers", JSON.stringify(updatedOccupied)) 
-            return updatedOccupied
-        })
+            const updatedOccupied = [...prevOccupied, idx];
+            sessionStorage.setItem("occupiedLockers", JSON.stringify(updatedOccupied)); 
+            return updatedOccupied;
+        });
     
         setfetchPackage(prevPackages => {
             const updatedPackages = prevPackages.map(pkg => 
-                pkg.number === packageNumber ? { ...pkg, lockerStatus: 'lightgrey' } : pkg
-            ).sort((a, b) => (a.lockerStatus === 'lightgrey' ? 1 : -1)) 
+                pkg.number === packageNumber ? { ...pkg, lockerStatus: 'gray' } : pkg
+            ).sort((a, b) => (a.lockerStatus === 'gray' ? 1 : -1)); 
     
-            localStorage.setItem("packages", JSON.stringify(updatedPackages)) 
-            return updatedPackages
-        })
+            return updatedPackages;
+        });
     
         try {
             const result = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/addLockerNumber`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ lockernumber: idx, number: packageNumber })
-            })
+            });
     
             if (result.ok) {
-                console.log(await result.json())
+                console.log(await result.json());
             } else {
-                console.error("Błąd podczas zapisu do API")
+                console.error("Błąd podczas zapisu do API");
             }
         } catch (error) {
+            console.error("Błąd podczas aktualizacji numeru szafki");
         }
     }
-    
-    
-    
 
     const getLockerStyle = (index) => {
-        const currentRandomNumbers = lockerNum === 1 ? randomNumbers1 : lockerNum === 2 ? randomNumbers2 : randomNumbers3
+        const currentRandomNumbers = lockerNum === 1 ? randomNumbers1 : lockerNum === 2 ? randomNumbers2 : randomNumbers3;
         
-        const islightgrey = fetchPackage.some(pkg => pkg.lockerStatus === 'lightgrey' && pkg.packagelocker === index)
+        const isGray = fetchPackage.some(pkg => pkg.lockerStatus === 'gray' && pkg.packagelocker === index);
     
-        if (islightgrey || currentRandomNumbers[index] === 0 || currentRandomNumbers[index] < 0.3 || occupiedLockers.includes(index)) {
-            return { backgroundColor: 'red', cursor: 'default' } 
+        if (isGray || currentRandomNumbers[index] === 0 || currentRandomNumbers[index] < 0.3 || occupiedLockers.includes(index)) {
+            return { backgroundColor: 'red', cursor: 'default' }; 
         }
     
         if (index === selectedLocker) {
-            return { backgroundColor: 'green', cursor: 'pointer' }
+            return { backgroundColor: 'green', cursor: 'pointer' };
         }
     
-        return packageClicked ? null : { cursor: 'default' }
-    }
-    
-    
+        return packageClicked ? null : { cursor: 'default' };
+    };
 
     useEffect(() => {
-        setLockerInfo("Choose package")
+        setLockerInfo("Choose package");
     
-        const storedPackages = JSON.parse(localStorage.getItem("packages"))
-        if (storedPackages) {
-            setfetchPackage(storedPackages)
-        }
+        const occupied = JSON.parse(sessionStorage.getItem("occupiedLockers")) || [];
+        setOccupiedLockers(occupied);
     
-        const occupied = JSON.parse(sessionStorage.getItem("occupiedLockers")) || []
-        setOccupiedLockers(occupied)
+        const packageLocker_1 = JSON.parse(sessionStorage.getItem("random_1")) || Array.from({ length: 70 }, () => Math.random());
+        const packageLocker_2 = JSON.parse(sessionStorage.getItem("random_2")) || Array.from({ length: 70 }, () => Math.random());
+        const packageLocker_3 = JSON.parse(sessionStorage.getItem("random_3")) || Array.from({ length: 70 }, () => Math.random());
     
-        const packageLocker_1 = JSON.parse(sessionStorage.getItem("random_1")) || Array.from({ length: 70 }, () => Math.random())
-        const packageLocker_2 = JSON.parse(sessionStorage.getItem("random_2")) || Array.from({ length: 70 }, () => Math.random())
-        const packageLocker_3 = JSON.parse(sessionStorage.getItem("random_3")) || Array.from({ length: 70 }, () => Math.random())
-    
-        setRandomNumbers1(packageLocker_1)
-        setRandomNumbers2(packageLocker_2)
-        setRandomNumbers3(packageLocker_3)
-    }, [])
+        setRandomNumbers1(packageLocker_1);
+        setRandomNumbers2(packageLocker_2);
+        setRandomNumbers3(packageLocker_3);
+    }, []);
     
 
     useEffect(() => {
@@ -154,9 +144,9 @@ const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible, handle
                         <div key={index}>
                             <button
                                 className="packages-locker"
-                                style={{ backgroundColor: pkg.lockerStatus === 'lightgrey' ? 'lightgrey' : 'white', cursor: pkg.lockerStatus === 'lightgrey' ? 'default' : 'pointer' }}
+                                style={{ backgroundColor: pkg.lockerStatus === 'gray' ? 'gray' : 'white', cursor: pkg.lockerStatus === 'gray' ? 'default' : 'pointer' }}
                                 onClick={() => {
-                                    if (pkg.lockerStatus !== 'lightgrey') {
+                                    if (pkg.lockerStatus !== 'gray') { 
                                         handlePackageSelection(pkg)
                                         handlePackageClick(parseInt(pkg.packagelocker), pkg.number)
                                         setPackageNumber(pkg.number)

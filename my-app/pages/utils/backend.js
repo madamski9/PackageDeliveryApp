@@ -150,6 +150,23 @@ app.post('/home', async (req, res) => {
     res.status(500).send('Error selecting data from database')
   }
 })
+
+//! JWT VERIFY
+const verifyToken = (req, res, next) => {
+  const token = req.cookies['token'] //! odczytanie tokenu z ciasteczka
+  if (!token) {
+    return res.status(403).json({ message: "Access denied" })
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.NEXT_PUBLIC_JWT_SECRET)
+    req.user = decoded.id
+    console.log("id user:", req.user)
+    next() //! kontynuacja
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' })
+  }
+}
+
 app.post("/logout", (req, res) => {
   console.log("logout succesful")
   res.setHeader("Set-Cookie", cookie.serialize("token", "", {
@@ -159,11 +176,13 @@ app.post("/logout", (req, res) => {
     sameSite: "strict",
     path: "/"
   }));
-  res.status(200).json({ message: "Logged out successfully" });
+  res.status(200).json({ message: "Logged out successfully" })
+  res.redirect('/login')
 })
 
-app.post("/api/addPackage", async (req, res) => {
-  const { userId, number, name, packageLocker } = req.body
+app.post("/api/addPackage", verifyToken, async (req, res) => {
+  const { number, name, packageLocker } = req.body
+  const userId = req.user
   try {
     const client = await pool.connect()
     const initialStatus = "Sent"
@@ -243,8 +262,8 @@ app.post("/api/addLockerNumber", async (req, res) => {
   }
 })
 
-app.get("/api/getPackage", async (req, res) => {
-  const { userId } = req.query
+app.get("/api/getPackage", verifyToken, async (req, res) => {
+  const userId = req.user
   try {
     const client = await pool.connect()
     const result = await client.query('SELECT * FROM public.packages WHERE userId = $1',
@@ -259,7 +278,7 @@ app.get("/api/getPackage", async (req, res) => {
 })
 
 app.get("/api/getUserData", async (req, res) => {
-  const { userId } = req.query
+  const userId = req.user
   console.log("userId: ", userId)
   try {
     const client = await pool.connect()

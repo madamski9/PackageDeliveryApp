@@ -7,6 +7,10 @@ const DeleteButton = ({ pkg }) => {
         }
     }
     const fetchDeletePackages = async (number) => {
+        const storedPackages = JSON.parse(localStorage.getItem("packages")) || []
+        const updatedPackages = storedPackages.filter(pkg => pkg.number !== number)
+        console.log(updatedPackages)
+        localStorage.setItem("packages", JSON.stringify(updatedPackages))
         try {
             const result = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/deletePackage`, {
                 method: "DELETE",

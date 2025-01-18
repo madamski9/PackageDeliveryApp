@@ -21,7 +21,7 @@ const mainPage = () => {
     const [longDivVisible, setLongDivVisivle] = useState(false)
     const [selectedPackages, setSelectedPackages] = useState(null)
     const [messages, setMessages] = useState([])
-    
+
     useEffect(() => {
         const client = mqtt.connect('wss://localhost:9001')
 
@@ -106,12 +106,11 @@ const mainPage = () => {
     }
 
     const fetchPackages = async () => {
-        const userId = localStorage.getItem("userId")
-        console.log("userId: ", userId)
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/getPackage?userId=${userId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/getPackage`, {
                 method: "GET",
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json" },
+                credentials: "include"
             })
             if (response.ok) {
                 const data = await response.json()
@@ -129,12 +128,11 @@ const mainPage = () => {
         }
     }
     const fetchUserData = async () => {
-        const userId = localStorage.getItem("userId")
-        console.log(userId)
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/getUserData?userId=${userId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/getUserData`, {
                 method: "GET",
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json" },
+                credentials: "include"
             })
             if (response.ok) {
                 const data = await response.json()

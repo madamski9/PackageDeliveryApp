@@ -8,6 +8,7 @@ const AddPackage = () => {
     const [error, setError] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [countdown, setCountdown] = useState(0)
+    const [packageStatus, setPackageStatus] = useState("")
 
     useEffect(() => {
         const lastSubmitTime = localStorage.getItem("lastSubmitTime")
@@ -41,7 +42,6 @@ const AddPackage = () => {
 
         if (isSubmitting) return
 
-        const userId = localStorage.getItem("userId")
         if (!packageName || !packageNumber) {
             setError("Type something")
             return
@@ -51,12 +51,14 @@ const AddPackage = () => {
         setCountdown(5)
         localStorage.setItem("lastSubmitTime", Date.now())
 
-        const number = Math.floor(Math.random() * 3) + 1
+        const number = Math.floor(Math.random() * 3) + 1 
+
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/addPackage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId, name: packageName, number: packageNumber, packageLocker: number })
+                body: JSON.stringify({ name: packageName, number: packageNumber, packageLocker: number }),
+                credentials: "include"
             })
 
             if (response.ok) {
