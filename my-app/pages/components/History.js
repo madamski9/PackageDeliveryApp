@@ -1,3 +1,5 @@
+import DeleteButton from "./DeleteButton"
+
 const History = ({ filteredDeliveredPackages, handlePackageSelection}) => {
     return (
         <div className="history-div">
@@ -12,6 +14,7 @@ const History = ({ filteredDeliveredPackages, handlePackageSelection}) => {
                             <p>Number: {pkg.number}</p>
                             <p>Name: {pkg.name}</p>
                             <p>Status: {pkg.status}</p>
+                            <DeleteButton pkg={pkg}/>
                         </button>
                     </div>
                 ))

@@ -9,6 +9,7 @@ const Header = ({ handleLogout, handleMenuClick, handleUserInfoClick, setHeaderI
 
     const handleRemoveClick = () => {
         localStorage.removeItem("messages")
+        setNotificationVisible(!notificationVisible)
         setNotificationNumber(0)
     }
     useEffect(() => {

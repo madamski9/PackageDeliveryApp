@@ -1,12 +1,12 @@
 import { useState, useEffect, act } from "react"
 import { useRouter } from "next/router"
-import "./components/Overview.js"
 import Overview from "./components/Overview.js"
 import History from "./components/History.js"
 import PackageLocker from "./components/PackageLocker.js"
 import Header from "./components/Header.js"
 import Map from "./components/Map.js"
 import mqtt from 'mqtt'
+import ClearHistoryButton from "./components/ClearHistoryButton.js"
 
 const mainPage = () => {
     const router = useRouter()
@@ -210,6 +210,11 @@ const mainPage = () => {
                                 className="button-main-2"
                                 onClick={() => setActivePage("Package locker")}
                             >Package locker</button>
+                            {activePage === "History" ? (
+                                <ClearHistoryButton/>
+                            ) : (
+                                null
+                            )}
                         </div>
                         <div>{renderContent()}</div>
                     </div>

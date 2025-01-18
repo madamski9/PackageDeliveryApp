@@ -181,7 +181,6 @@ app.post("/api/addPackage", async (req, res) => {
   }
 })
 const statusSequence = ["Sent", "Accepted for execution", "On the way", "Delivered"]
-// const clientMqtt = mqtt.connect('mqtt://localhost:1883')
 clientMqtt.on('connect', () => {
   console.log('Połączono z brokerem MQTT');
 })
@@ -271,6 +270,19 @@ app.delete("/api/deletePackage", async (req, res) => {
   } catch (error) {
     console.error("Error deleting package:", error)
     res.status(500).send("error deleting package")
+  }
+})
+
+app.delete("/api/deleteAllPackages", async (req, res) => {
+  try {
+    const client = await pool.connect()
+    const result = await client.query('DELETE FROM public.packages')
+    console.log("Deleted all packages")
+    client.release()
+    res.status(200).json(result.rows)
+  } catch (error) {
+    console.error("error deleting all packages: ", error)
+    res.status(500).send("error deleting all packages")
   }
 })
 
