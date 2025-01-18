@@ -11,7 +11,6 @@ import ClearHistoryButton from "./components/ClearHistoryButton.js"
 const mainPage = () => {
     const router = useRouter()
     const [menuVisible, setMenuVisible] = useState(false)
-    const [userInfoVisible, setUserInfoVisible] = useState(false)
     const [headerInput, setHeaderInput] = useState("")
     const [activePage, setActivePage] = useState("Overview")
     const [fetchPackage, setfetchPackage] = useState([])
@@ -86,7 +85,6 @@ const mainPage = () => {
         }
     }
     const handleMenuClick = () => setMenuVisible(!menuVisible)
-    const handleUserInfoClick = () => setUserInfoVisible(!userInfoVisible)
 
     const handleLogout = async () => {
         try {
@@ -167,11 +165,24 @@ const mainPage = () => {
         renderContentLongDiv()
         switch (activePage) {
             case "Overview":
-                return <Overview fetchUser={fetchUser} filteredPackages={filteredPackages} handlePackageSelection={handlePackageSelection}/>
+                return <Overview 
+                    fetchUser={fetchUser} 
+                    filteredPackages={filteredPackages} 
+                    handlePackageSelection={handlePackageSelection}
+                    />
             case "History":
-                return <History filteredDeliveredPackages={filteredDeliveredPackages} handlePackageSelection={handlePackageSelection}/>
+                return <History 
+                    filteredDeliveredPackages={filteredDeliveredPackages} 
+                    handlePackageSelection={handlePackageSelection}
+                    />
             case "Package locker":
-                return <PackageLocker fetchPackage={fetchPackage} longDivVisible={longDivVisible} setLongDivVisible={setLongDivVisivle} handlePackageSelection={handlePackageSelection}/>
+                return <PackageLocker 
+                    fetchPackage={fetchPackage} 
+                    longDivVisible={longDivVisible} 
+                    setLongDivVisible={setLongDivVisivle} 
+                    handlePackageSelection={handlePackageSelection}
+                    setfetchPackage={setfetchPackage}
+                    />
         }
     }
     const renderContentLongDiv = () => {
@@ -192,9 +203,7 @@ const mainPage = () => {
                     <Header 
                         handleLogout={handleLogout} 
                         handleMenuClick={handleMenuClick} 
-                        handleUserInfoClick={handleUserInfoClick} 
                         setHeaderInput={setHeaderInput} 
-                        userInfoVisible={userInfoVisible}
                     />
                     <div className="main-2">
                         <div className="nav-main-2">

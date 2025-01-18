@@ -1,3 +1,4 @@
+
 import { useRouter } from "next/router"
 import DeleteButton from "./DeleteButton"
 const Overview = ({ fetchUser, filteredPackages, handlePackageSelection}) => {
@@ -35,7 +36,7 @@ const Overview = ({ fetchUser, filteredPackages, handlePackageSelection}) => {
                     </div>
             </div>
             <div className="overview-main-3">
-                <p className="addNewPackage">Your packages</p>
+                <p className="yourPackages">Your packages</p>
                 <div className="user-packages">
                     {filteredPackages.length > 0 ? (
                         filteredPackages.map((pkg, index) => (

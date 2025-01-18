@@ -2,10 +2,18 @@ import { useState, useEffect } from "react";
 import Notifications from "./Notifications.js";
 import mqtt from "mqtt";
 
-const Header = ({ handleLogout, handleMenuClick, handleUserInfoClick, setHeaderInput, userInfoVisible }) => {
+const Header = ({ handleLogout, handleMenuClick, setHeaderInput }) => {
     const [notificationVisible, setNotificationVisible] = useState(false);
     const [notificationNumber, setNotificationNumber] = useState(0)
+    const [userInfoVisible, setUserInfoVisible] = useState(false)
     console.log("notificationNumber: ", notificationNumber)
+
+    const handleUserInfoClick = () => {
+        if (notificationVisible) {
+            setNotificationVisible(!notificationVisible)
+        }
+        setUserInfoVisible(!userInfoVisible)
+    }
 
     const handleRemoveClick = () => {
         localStorage.removeItem("messages")
@@ -54,26 +62,33 @@ const Header = ({ handleLogout, handleMenuClick, handleUserInfoClick, setHeaderI
                     )}
                 <button
                     className="notificationButton"
-                    onClick={() => setNotificationVisible(!notificationVisible)}
+                    onClick={() => userInfoVisible ? setUserInfoVisible(!userInfoVisible) : setNotificationVisible(!notificationVisible)}
                 >
-                <img className="bell" src="/images/notification.png" />
+                    <img className="bell" src="/images/notification.png" />
                 </button>
                 <div className="transparent-div">
                     <Notifications setNotificationNumber={setNotificationNumber} />
                 </div>
                 {notificationVisible && (
-                    <div className="notification-div">
-                        <Notifications setNotificationNumber={setNotificationNumber} />
-                        {notificationNumber > 0 ? (
-                            <button
-                                onClick={() => handleRemoveClick()}
-                            >
-                                wyczysc
-                            </button>
-                        ) : (
-                            <p>You dont have any notifications</p>
-                        )}
-                    </div>
+                    <>
+                        <div className="notification-div">
+                            <Notifications setNotificationNumber={setNotificationNumber} />
+                            {notificationNumber > 0 ? (
+                                <button
+                                    className="clearNotificationButton"
+                                    onClick={() => handleRemoveClick()}
+                                >
+                                    Clear
+                                </button>
+                            ) : (
+                                <p>You dont have any notifications</p>
+                            )}
+                        </div>
+                        <div
+                            className="exitBigDiv2"
+                            onClick={() => setNotificationVisible(!notificationVisible)}
+                        ></div>
+                    </>
                 )}
                 <button
                     className="profile"
@@ -83,15 +98,14 @@ const Header = ({ handleLogout, handleMenuClick, handleUserInfoClick, setHeaderI
                 </button>
                 {userInfoVisible && (
                 <>
-                    <div className="arrow"></div>
                     <div className="userInfo">
-                    <button
-                        className="buttonLogout"
-                        onClick={() => handleLogout()}
-                    >
-                        Logout
-                        <img className="logoutImg" src="/images/logout.png" />
-                    </button>
+                        <button
+                            className="buttonLogout"
+                            onClick={() => handleLogout()}
+                        >
+                            Logout
+                            <img className="logoutImg" src="/images/logout.png" />
+                        </button>
                     </div>
                     <div
                         className="exitBigDiv"

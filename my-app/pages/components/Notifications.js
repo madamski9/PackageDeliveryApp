@@ -51,7 +51,7 @@ const Notifications = ({ setNotificationNumber }) => {
         <div>
             <div className="notificationMsg" style={{color: 'black'}}>
                 {messages.map((msg, index) => (
-                    <li key={index}>{msg}</li> 
+                    <div key={index}>{msg}</div> 
                 ))}
             </div>
         </div>

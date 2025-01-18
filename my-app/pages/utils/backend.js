@@ -190,7 +190,7 @@ clientMqtt.on('error', (error) => {
 const updatePackageStatus = async () => {
   try {
     const client = await pool.connect()
-    const result = await client.query(`SELECT id, status, number FROM public.packages WHERE status != 'Delivered'`)
+    const result = await client.query(`SELECT id, status, number, lockernumber FROM public.packages WHERE status != 'Delivered'`)
     console.log(result.rows)
     for (let packages of result.rows) {
       const currIdx = statusSequence.indexOf(packages.status) 
@@ -203,6 +203,13 @@ const updatePackageStatus = async () => {
         console.log(`Updated package ${packages.id} to status: ${newStatus}`)
 
         if (newStatus === "Delivered") {
+          if (!packages.lockernumber) {
+            const randomNum = Math.floor(Math.random()*60) + 1
+            await client.query(
+              'UPDATE public.packages SET lockernumber = $1 WHERE id = $2',
+              [randomNum, packages.id]
+            )
+          }
           clientMqtt.publish("/package/delivered", JSON.stringify({
             message: `Package number ${packages.number} is delivered!`,
           }), (err) => {
@@ -220,7 +227,21 @@ const updatePackageStatus = async () => {
     console.error("Error updating package status:", error)
   }
 }
-setInterval(updatePackageStatus,  10 * 1000) //* co pol godziny
+setInterval(updatePackageStatus, 60 * 60 * 1000) //* co pol godziny
+
+app.post("/api/addLockerNumber", async (req, res) => {
+  const { lockernumber, number } = req.body
+  try {
+    const client = await pool.connect()
+    const result = await client.query('UPDATE public.packages SET lockernumber = $1 WHERE number = $2',
+      [lockernumber, number]
+    )
+    client.release()
+    res.status(200).json(result.rows[0])
+  } catch (error) {
+    res.status(500).send("Error updating package locker number")
+  }
+})
 
 app.get("/api/getPackage", async (req, res) => {
   const { userId } = req.query
@@ -276,7 +297,7 @@ app.delete("/api/deletePackage", async (req, res) => {
 app.delete("/api/deleteAllPackages", async (req, res) => {
   try {
     const client = await pool.connect()
-    const result = await client.query('DELETE FROM public.packages')
+    const result = await client.query(`DELETE FROM public.packages WHERE status = 'Delivered'`)
     console.log("Deleted all packages")
     client.release()
     res.status(200).json(result.rows)
