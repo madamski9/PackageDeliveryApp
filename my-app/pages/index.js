@@ -24,7 +24,7 @@ const HomePage = () => {
             const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/home`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: login, password: password }),
+                body: JSON.stringify({ email: login, password: password }),
                 credentials: "include"
             })
             if (response.ok) {
@@ -56,7 +56,7 @@ const HomePage = () => {
             <form onSubmit={handleSubmit} className="form">
                 <input
                     type="text"
-                    placeholder="Login"
+                    placeholder="Email"
                     className="input-login"
                     onChange={(e) => setLogin(e.target.value)}
                 />

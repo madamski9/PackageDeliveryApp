@@ -15,7 +15,8 @@ const DeleteButton = ({ pkg }) => {
             const result = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/deletePackage`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ number})
+                body: JSON.stringify({ number}),
+                credentials: "include"
             })
             if (!result.ok) {
                 throw new Error("Failed to delete package");

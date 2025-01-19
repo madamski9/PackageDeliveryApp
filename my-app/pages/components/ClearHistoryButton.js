@@ -5,7 +5,8 @@ const ClearHistoryButton = () => {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/deleteAllPackages`, {
                     method: "DELETE",
-                    headers: {"Content-Type": "application/json"}
+                    headers: {"Content-Type": "application/json"},
+                    credentials: "include"
                 })
                 const data = await response.json()
                 console.log(data)

@@ -27,17 +27,17 @@ app.use(cookieParser())
 const clientMqtt = mqtt.connect('wss://localhost:9001', {
   rejectUnauthorized: false, 
 })
-const MQTT_TOPIC = "/package/delivered"
+// const MQTT_TOPIC = "/package/delivered"
 
 clientMqtt.on("connect", () => {
     console.log("Connected to MQTT broker")
-    clientMqtt.subscribe(MQTT_TOPIC)
+    // clientMqtt.subscribe(MQTT_TOPIC)
 })
-clientMqtt.on("message", (topic, message) => {
-    if (topic === MQTT_TOPIC) {
-        console.log("Received: ", message.toString())
-    }
-})
+// clientMqtt.on("message", (topic, message) => {
+//     if (topic === MQTT_TOPIC) {
+//         console.log("Received: ", message.toString())
+//     }
+// })
 clientMqtt.on("error", (error) => {
     console.error("mqtt error: ", error)
 })
@@ -75,23 +75,23 @@ export const pool = new Pool({
 })
 
 app.post('/register', async (req, res) => {
-  const { name, surname, password, phone, addres } = req.body
+  const { name, surname, email, password, phone, addres } = req.body
   const hash = await bcrypt.hash(password, 10)
   try {
     const client = await pool.connect()
     const checkName = await client.query(
-      'SELECT name FROM public.user WHERE name = $1',
-      [name]
+      'SELECT email FROM public.user WHERE email = $1',
+      [email]
     )
     console.log(checkName.rows)
     if (checkName.rows.length > 0) {
-      console.log("nazwa juz istnieje")
+      console.log("email juz istnieje")
       client.release() 
-      res.status(409).send("Name is taken")
+      res.status(409).send("Email is taken")
     } else {
       const result = await client.query(
-        'INSERT INTO public.user (name, surname, password, phone, addres) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [name, surname, hash, phone, addres]
+        'INSERT INTO public.user (name, surname, email, password, phone, addres) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [name, surname, email, hash, phone, addres]
       )
       console.log(result.rows)
       res.status(200).json(result.rows[0])
@@ -103,12 +103,12 @@ app.post('/register', async (req, res) => {
 })
 
 app.post('/home', async (req, res) => {
-  const { name, password } = req.body
+  const { email, password } = req.body
   try {
     const client = await pool.connect()
     const result = await client.query(
-      'SELECT * FROM public.user WHERE name = $1',
-      [name]
+      'SELECT * FROM public.user WHERE email = $1',
+      [email]
     )
     if (result.rows.length === 0) {
       res.status(401).send('Invalid username or password')
@@ -135,14 +135,20 @@ app.post('/home', async (req, res) => {
         sameSite: "strict",
         path: "/"
       }))
-      console.log("Set-Cookie header:", res.getHeaders()['set-cookie']);
-      console.log("ciasteczka1:", req.cookies)
+      // const MQTT_TOPIC = `/user/${user.id}/package/delivered`
+      // clientMqtt.subscribe(MQTT_TOPIC, (err) => {
+      //   if (err) {
+      //     console.error(`Błąd subskrypcji MQTT dla ${MQTT_TOPIC}:`, err)
+      //   } else {
+      //     console.log(`Subskrybowano temat: ${MQTT_TOPIC}`)
+      //   }
+      // })
       res.status(200).json({
         id: user.id,
         name: user.name
       })
     } else {
-      res.status(401).send('Invalid username or password')
+      res.status(401).send('Invalid email or password')
     }
     client.release()
   } catch (err) {
@@ -206,13 +212,15 @@ clientMqtt.on('connect', () => {
 clientMqtt.on('error', (error) => {
   console.error('Błąd połączenia z brokerem MQTT:', error);
 })
+// Funkcja updatePackageStatus wywoływana co 10 sekund, dla zalogowanego użytkownika
 const updatePackageStatus = async () => {
   try {
     const client = await pool.connect()
-    const result = await client.query(`SELECT id, status, number, lockernumber FROM public.packages WHERE status != 'Delivered'`)
+    const result = await client.query(`SELECT id, userId, status, number, lockernumber FROM public.packages WHERE status != 'Delivered'`)
     console.log(result.rows)
+
     for (let packages of result.rows) {
-      const currIdx = statusSequence.indexOf(packages.status) 
+      const currIdx = statusSequence.indexOf(packages.status)
       if (currIdx >= 0 && currIdx < statusSequence.length - 1) {
         const newStatus = statusSequence[currIdx + 1]
         await client.query(
@@ -229,7 +237,13 @@ const updatePackageStatus = async () => {
               [randomNum, packages.id]
             )
           }
-          clientMqtt.publish("/package/delivered", JSON.stringify({
+          if (packages.userid === undefined) {
+            console.error("Brak userId w paczce:", packages);
+            return; // Nie wykonuj publikacji, jeśli userId jest niezdefiniowane
+          }
+          
+          // Publikowanie MQTT z userId z JWT
+          clientMqtt.publish(`/user/${packages.userid}/package/delivered`, JSON.stringify({
             message: `Package number ${packages.number} is delivered!`,
           }), (err) => {
             if (err) {
@@ -246,7 +260,9 @@ const updatePackageStatus = async () => {
     console.error("Error updating package status:", error)
   }
 }
-setInterval(updatePackageStatus, 60 * 60 * 1000) //* co pol godziny
+
+// Ustawienie interwału, który wywołuje funkcję co 10 sekund (na serwerze)
+setInterval(updatePackageStatus, 10 * 1000) // co 10 sekund
 
 app.post("/api/addLockerNumber", async (req, res) => {
   const { lockernumber, number } = req.body
@@ -277,7 +293,7 @@ app.get("/api/getPackage", verifyToken, async (req, res) => {
   }
 })
 
-app.get("/api/getUserData", async (req, res) => {
+app.get("/api/getUserData", verifyToken, async (req, res) => {
   const userId = req.user
   console.log("userId: ", userId)
   try {
@@ -291,12 +307,13 @@ app.get("/api/getUserData", async (req, res) => {
     res.status(500).send("error fetching user data")
   }
 })
-app.delete("/api/deletePackage", async (req, res) => {
+app.delete("/api/deletePackage", verifyToken, async (req, res) => {
   const { number } = req.body
+  const userId = req.user
   try {
     const client = await pool.connect()
-    const result = await client.query('DELETE FROM public.packages WHERE number = $1 RETURNING *',
-      [number]
+    const result = await client.query('DELETE FROM public.packages WHERE number = $1 AND userId = $2 RETURNING *',
+      [number, userId]
     )
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Package not found" });
@@ -313,10 +330,13 @@ app.delete("/api/deletePackage", async (req, res) => {
   }
 })
 
-app.delete("/api/deleteAllPackages", async (req, res) => {
+app.delete("/api/deleteAllPackages", verifyToken, async (req, res) => {
+  const userId = req.user
   try {
     const client = await pool.connect()
-    const result = await client.query(`DELETE FROM public.packages WHERE status = 'Delivered'`)
+    const result = await client.query(`DELETE FROM public.packages WHERE status = 'Delivered' AND userId = $1`, 
+      [userId]
+    )
     console.log("Deleted all packages")
     client.release()
     res.status(200).json(result.rows)

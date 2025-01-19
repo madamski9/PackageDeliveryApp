@@ -4,6 +4,7 @@ import { useRouter } from "next/router"
 const RegisterPage = () => {
     const [name, setName] = useState("")
     const [surname, setSurname] = useState("")
+    const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [phone, setPhone] = useState("")
     const [addres, setAddres] = useState("")
@@ -11,10 +12,18 @@ const RegisterPage = () => {
     const [showPassword, setShowPassword] = useState(false)
     const router = useRouter()
 
+    const isEmailValid = (email) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        return emailRegex.test(email)
+    }
     const handleSumbit = async (e) => {
         e.preventDefault()
-        if (!name || !surname || !password || !phone || !addres) {
-            setError("Wszystkie pola są wymagane!")
+        if (!name || !surname || !password || !phone || !addres || !email) {
+            setError("All fields are required!")
+            return
+        }
+        if (!isEmailValid(email)) {
+            setError("Please enter correct email")
             return
         }
         try {
@@ -23,7 +32,7 @@ const RegisterPage = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ name, surname, password, phone, addres})
+                body: JSON.stringify({ name, surname, email, password, phone, addres})
             })
 
             if (response.ok) {
@@ -62,6 +71,12 @@ const RegisterPage = () => {
                         onChange={(e) => setSurname(e.target.value)}
                     />
                 </div>
+                <input
+                    type="text"
+                    placeholder="Email"
+                    className="input-address"
+                    onChange={(e) => setEmail(e.target.value)}
+                />
                 <input
                     type="text"
                     placeholder="Ulica"

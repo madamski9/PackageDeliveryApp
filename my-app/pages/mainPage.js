@@ -24,11 +24,12 @@ const mainPage = () => {
 
     useEffect(() => {
         const client = mqtt.connect('wss://localhost:9001')
+        const userId = localStorage.getItem("userId")
 
         client.on('connect', () => {
             console.log('Połączono z brokerem MQTT')
             
-            client.subscribe('lockers/package/+/delivered', (err) => {
+            client.subscribe(`/user/${userId}/package/delivered`, (err) => {
                 if (err) {
                     console.log('Błąd subskrypcji:', err)
                 } else {
@@ -41,7 +42,7 @@ const mainPage = () => {
             const msg = JSON.parse(message.toString())
             console.log(`Otrzymano wiadomość na temat ${topic}:`, msg)
         
-            if (topic === 'lockers/package/+/delivered') {
+            if (topic === `/user/${userId}/package/delivered`) {
                 try {
                     const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_API}/api/updatePackageStatus`, {
                         method: 'POST',
@@ -137,7 +138,7 @@ const mainPage = () => {
             if (response.ok) {
                 const data = await response.json()
                 setFetchUser(data)
-                console.log(data)
+                console.log("user data: ", data)
             } else {
                 if (response.status === 500) {
                     console.error("Something wrong while fetching user data - error 500")
