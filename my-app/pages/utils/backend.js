@@ -135,14 +135,6 @@ app.post('/home', async (req, res) => {
         sameSite: "strict",
         path: "/"
       }))
-      // const MQTT_TOPIC = `/user/${user.id}/package/delivered`
-      // clientMqtt.subscribe(MQTT_TOPIC, (err) => {
-      //   if (err) {
-      //     console.error(`Błąd subskrypcji MQTT dla ${MQTT_TOPIC}:`, err)
-      //   } else {
-      //     console.log(`Subskrybowano temat: ${MQTT_TOPIC}`)
-      //   }
-      // })
       res.status(200).json({
         id: user.id,
         name: user.name
@@ -212,7 +204,6 @@ clientMqtt.on('connect', () => {
 clientMqtt.on('error', (error) => {
   console.error('Błąd połączenia z brokerem MQTT:', error);
 })
-// Funkcja updatePackageStatus wywoływana co 10 sekund, dla zalogowanego użytkownika
 const updatePackageStatus = async () => {
   try {
     const client = await pool.connect()
@@ -239,10 +230,9 @@ const updatePackageStatus = async () => {
           }
           if (packages.userid === undefined) {
             console.error("Brak userId w paczce:", packages);
-            return; // Nie wykonuj publikacji, jeśli userId jest niezdefiniowane
+            return; 
           }
           
-          // Publikowanie MQTT z userId z JWT
           clientMqtt.publish(`/user/${packages.userid}/package/delivered`, JSON.stringify({
             message: `Package number ${packages.number} is delivered!`,
           }), (err) => {
@@ -261,8 +251,7 @@ const updatePackageStatus = async () => {
   }
 }
 
-// Ustawienie interwału, który wywołuje funkcję co 10 sekund (na serwerze)
-setInterval(updatePackageStatus, 10 * 1000) // co 10 sekund
+setInterval(updatePackageStatus, 60*60 * 1000) //* co 60 min
 
 app.post("/api/addLockerNumber", async (req, res) => {
   const { lockernumber, number } = req.body
