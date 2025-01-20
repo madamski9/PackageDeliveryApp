@@ -13,7 +13,7 @@ const History = ({ filteredDeliveredPackages, handlePackageSelection}) => {
                             <img className="truck" src="/images/delivery.png"/>
                             <p>Number: {pkg.number}</p>
                             <p>Name: {pkg.name}</p>
-                            <p>Status: {pkg.status}</p>
+                            <p>Locker number: {pkg.lockernumber}</p>
                             <DeleteButton pkg={pkg}/>
                         </button>
                     </div>

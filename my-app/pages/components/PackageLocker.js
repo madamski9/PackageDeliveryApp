@@ -188,7 +188,6 @@ const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible, handle
                                 <img className="truck" src="/images/delivery.png" />
                                 <p>Number: {pkg.number}</p>
                                 <p>Name: {pkg.name}</p>
-                                <p>Status: {pkg.status}</p>
                             </button>
                         </div>
                     ))

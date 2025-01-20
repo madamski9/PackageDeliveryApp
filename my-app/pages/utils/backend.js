@@ -272,7 +272,7 @@ const updatePackageStatus = async () => {
   }
 }
 
-setInterval(updatePackageStatus, 10 * 1000) //* co 60 min
+setInterval(updatePackageStatus, 60 * 60 * 1000) //* co 60 min
 
 app.post("/api/addLockerNumber", async (req, res) => {
   const { lockernumber, number } = req.body
@@ -326,7 +326,7 @@ app.delete("/api/deletePackage", verifyToken, async (req, res) => {
       [number, userId]
     )
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Package not found" });
+      return res.status(404).json({ error: "Package not found" })
     }
     console.log("Deleted package number: ", result.rows)
     client.release()
