@@ -111,32 +111,32 @@ const mainPage = () => {
         switch (activePage) {
             case "Overview":
                 return <Overview 
-                    fetchUser={fetchUser} 
-                    filteredPackages={filteredPackages} 
-                    handlePackageSelection={handlePackageSelection}
+                        fetchUser={fetchUser} 
+                        filteredPackages={filteredPackages} 
+                        handlePackageSelection={handlePackageSelection}
                     />
             case "History":
                 return <History 
-                    filteredDeliveredPackages={filteredDeliveredPackages} 
-                    handlePackageSelection={handlePackageSelection}
+                        filteredDeliveredPackages={filteredDeliveredPackages} 
+                        handlePackageSelection={handlePackageSelection}
                     />
             case "Package locker":
                 return <PackageLocker 
-                    fetchPackage={fetchPackage} 
-                    longDivVisible={longDivVisible} 
-                    setLongDivVisible={setLongDivVisivle} 
-                    handlePackageSelection={handlePackageSelection}
-                    setfetchPackage={setfetchPackage}
+                        fetchPackage={fetchPackage} 
+                        longDivVisible={longDivVisible} 
+                        setLongDivVisible={setLongDivVisivle} 
+                        handlePackageSelection={handlePackageSelection}
+                        setfetchPackage={setfetchPackage}
                     />
         }
     }
     const renderContentLongDiv = () => {
-        return <Map selectedPackages={selectedPackages}/>
+        return <Map selectedPackages={selectedPackages} setSelectedPackages={setSelectedPackages}/>
     }
     
     return (
         <div className="body">
-            <WebSocketComponent setFilteredPackages={setFilteredPackages} setFilteredDeliveredPackages={setFilteredDeliveredPackages}/>
+            <WebSocketComponent setFilteredPackages={setFilteredPackages} setFilteredDeliveredPackages={setFilteredDeliveredPackages} setSelectedPackages={setSelectedPackages} setfetchPackage={setfetchPackage}/>
             <div className="gridContainer">
                 <div className="column1">
                     <Header 

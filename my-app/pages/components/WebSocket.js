@@ -1,36 +1,47 @@
 import { useEffect, useState } from "react"
 
-const WebSocketComponent = ({ setFilteredPackages, setFilteredDeliveredPackages }) => {
-    const [message, setMessage] = useState("")
-
+const WebSocketComponent = ({ setFilteredPackages, setFilteredDeliveredPackages, setSelectedPackages, setfetchPackage }) => {
     useEffect(() => {
         const ws = new WebSocket("wss://localhost:3001")
 
         ws.onopen = () => console.log("Połączono z WebSocket (WSS)")
+
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data)
-            console.log("Otrzymano dane:", data)
-            if (data.status !== "Delivered") {
+
+            if (data.status === "Sent") {
+                data.status = "Accepted for execution"
+            } else if (data.status === "Accepted for execution") {
+                data.status = "On the way"
+            } else if (data.status === "On the way") {
                 data.status = "Delivered"
             }
+
+            console.log("Otrzymano status paczki: ", data.status)
+
+            localStorage.setItem("selectedPackage", JSON.stringify(data))
+
+            setSelectedPackages(data)
+
             if (data.status === "Delivered") {
                 setFilteredPackages((prevPackages) =>
-                    prevPackages.filter(pkg => pkg.id !== data.id) 
-                );
-    
+                    prevPackages.filter(pkg => pkg.id !== data.id)
+                )
+
+                setfetchPackage(data)
+
                 setFilteredDeliveredPackages((prevDeliveredPackages) =>
-                    [...prevDeliveredPackages, data] 
-                );
-            } else {
-                console.log("Status paczki:", data.status)
+                    [...prevDeliveredPackages, data]
+                )
             }
         }
+
         ws.onclose = () => console.log("Połączenie WebSocket zamknięte")
 
         return () => ws.close()
-    }, [])
+    }, [setSelectedPackages, setFilteredPackages, setFilteredDeliveredPackages])
 
-    return <div>{message}</div>
+    return null
 }
 
 export default WebSocketComponent

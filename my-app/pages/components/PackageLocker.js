@@ -123,13 +123,18 @@ const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible, handle
         const grayPackages = storedPackages.filter((pkg) => pkg.lockerStatus === "gray" && pkg.userId === userId)
 
         if (grayPackages.length > 0) {
-            setfetchPackage((prevPackages = []) =>
-                prevPackages.map((pkg) =>
-                    grayPackages.some((grayPkg) => grayPkg.number === pkg.number) ? { ...pkg, lockerStatus: "gray" } : pkg
-                )
+            setfetchPackage((prevPackages) => 
+                Array.isArray(prevPackages) 
+                    ? prevPackages.map((pkg) =>
+                        grayPackages.some((grayPkg) => grayPkg.number === pkg.number)
+                            ? { ...pkg, lockerStatus: "gray" }
+                            : pkg
+                    )
+                    : [] 
             )
         }
-    }, [])
+        
+    }, [setfetchPackage])
 
     const getLockerStyle = (index) => {
         const currentRandomNumbers =

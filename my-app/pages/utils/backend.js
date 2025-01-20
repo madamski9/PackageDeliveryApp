@@ -235,13 +235,13 @@ const updatePackageStatus = async () => {
         )
         console.log(`Updated package ${packages.id} to status: ${newStatus}`)
 
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+              console.log("Sending delivered package to WebSocket client");
+              client.send(JSON.stringify(packages))
+          }
+        })
         if (newStatus === "Delivered") {
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-                console.log("Sending delivered package to WebSocket client");
-                client.send(JSON.stringify(packages))
-            }
-          })
           if (!packages.lockernumber) {
             const randomNum = Math.floor(Math.random()*60) + 1
             await client.query(
