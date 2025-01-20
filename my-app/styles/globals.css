@@ -674,8 +674,11 @@
     overflow-y: auto;
     overflow-x: hidden;
 }
+.notification-item {
+    color: black;
+}
 .notificationMsg {
-    color: white;
+    color: black;
     font-size: 10px;
     margin-top: 5px;
     padding: 10px;

@@ -15,7 +15,13 @@ const Notifications = ({ userId }) => {
             {userNotifications.length > 0 ? (
                 userNotifications.map((pkg, index) => (
                     <div key={index} className="notification-item">
-                        <p>{pkg.packageInfo}</p>
+                        <p>
+                            {pkg.packageInfo ? (
+                                JSON.parse(pkg.packageInfo).message
+                            ) : (
+                                <span>No valid messages available.</span>
+                            )}
+                        </p>
                     </div>
                 ))
             ) : (
