@@ -173,6 +173,7 @@ const mainPage = () => {
             </div>
             {menuVisible && (
                 <div className="menuPage">
+                    <div className="bigDiv3" onClick={handleMenuClick}></div>
                     <button className="xButton" onClick={handleMenuClick}>
                         X
                     </button>

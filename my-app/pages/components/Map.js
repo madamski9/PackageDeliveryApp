@@ -7,19 +7,14 @@ const Map = ({ selectedPackages }) => {
     const statusOrder = ["Sent", "Accepted for execution", "On the way", "Delivered"]
 
     useEffect(() => {
-        const storedPackage = JSON.parse(localStorage.getItem("selectedPackage"))
-        if (storedPackage) {
-            setCurrentPackage(storedPackage)
-        }
-    }, [])
-
-    useEffect(() => {
-        if (selectedPackages) {
+        if (selectedPackages && selectedPackages.number) {
             setCurrentPackage(selectedPackages)
         }
     }, [selectedPackages])
 
-    if (!currentPackage) return null
+    if (!currentPackage) {
+        return <div style={{display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%"}}>Select Package</div> 
+    }
 
     const getDotClass = (status) => {
         const packageStatusIndex = statusOrder.indexOf(currentPackage.status)
@@ -38,14 +33,14 @@ const Map = ({ selectedPackages }) => {
         <div className="map-div">
             <div className="map-top">
                 <div className="map-package-div">
-                    <img className="map-package" src="/images/package.png" />
+                    <img className="map-package" src="/images/package.png" alt="Package" />
                 </div>
                 <div className="map-top-status">
                     <div>{currentPackage.status}</div>
                     <div className="map-top-number">{currentPackage.number}</div>
                 </div>
             </div>
-            <img className="map" src="/images/map.png" />
+            <img className="map" src="/images/map.png" alt="Map" />
             {currentPackage && (
                 <>
                     <div className={`pl${currentPackage.packagelocker}`}>
@@ -53,6 +48,7 @@ const Map = ({ selectedPackages }) => {
                         <img
                             className={`pl${currentPackage.packagelocker}-img`}
                             src="/images/locker.png"
+                            alt="Locker"
                             onMouseEnter={() => setShowLockerInfo(true)}
                             onMouseLeave={() => setShowLockerInfo(false)}
                         />

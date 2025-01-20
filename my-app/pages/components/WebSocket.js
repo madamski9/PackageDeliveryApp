@@ -19,8 +19,6 @@ const WebSocketComponent = ({ setFilteredPackages, setFilteredDeliveredPackages,
 
             console.log("Otrzymano status paczki: ", data.status)
 
-            localStorage.setItem("selectedPackage", JSON.stringify(data))
-
             setSelectedPackages(data)
 
             if (data.status === "Delivered") {

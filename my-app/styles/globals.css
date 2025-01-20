@@ -156,7 +156,7 @@
     position: absolute;
     height: 100%;
     width: 320px;
-    background-color: red;
+    background-color: rgb(255, 255, 255);
     top: 0;
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
@@ -186,6 +186,14 @@
     font-size: medium;
     text-align: center;
     margin: 10px;
+    cursor: pointer;
+}
+.bigDiv3 {
+    position: absolute;
+    background-color: transparent;
+    height: 100%;
+    width: 136vh;
+    margin-left: 320px;
 }
 .headerInput {
     flex-grow: 0;
@@ -676,6 +684,9 @@
 }
 .notification-item {
     color: black;
+    font-size: 15px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 .notificationMsg {
     color: black;

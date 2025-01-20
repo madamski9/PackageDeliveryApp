@@ -150,9 +150,6 @@ const Header = ({ handleLogout, handleMenuClick, setHeaderInput }) => {
                 {userInfoVisible && (
                     <>
                         <div className="userInfo">
-                            <button className="settings" onClick={() => router.push("/components/Settings")}>
-                                Settings
-                            </button>
                             <button className="buttonLogout" onClick={handleLogout}>
                                 Logout
                                 <img className="logoutImg" src="/images/logout.png" />
