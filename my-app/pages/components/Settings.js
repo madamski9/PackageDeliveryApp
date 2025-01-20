@@ -10,7 +10,7 @@ const Settings = () => {
     return (
         <div className="addPackage-main">
             <div className="addPackage-main-2">
-                <p>Add new package</p>
+                <p>Settings</p>
                 <form onSubmit={handle}>
                     <input
                         type="text"

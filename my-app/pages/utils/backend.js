@@ -27,17 +27,10 @@ app.use(cookieParser())
 const clientMqtt = mqtt.connect('wss://localhost:9001', {
   rejectUnauthorized: false, 
 })
-// const MQTT_TOPIC = "/package/delivered"
 
 clientMqtt.on("connect", () => {
     console.log("Connected to MQTT broker")
-    // clientMqtt.subscribe(MQTT_TOPIC)
 })
-// clientMqtt.on("message", (topic, message) => {
-//     if (topic === MQTT_TOPIC) {
-//         console.log("Received: ", message.toString())
-//     }
-// })
 clientMqtt.on("error", (error) => {
     console.error("mqtt error: ", error)
 })
