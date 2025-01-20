@@ -5,7 +5,7 @@ import History from "./components/History.js"
 import PackageLocker from "./components/PackageLocker.js"
 import Header from "./components/Header.js"
 import Map from "./components/Map.js"
-import mqtt from 'mqtt'
+import WebSocketComponent from "./components/WebSocket.js"
 import ClearHistoryButton from "./components/ClearHistoryButton.js"
 
 const mainPage = () => {
@@ -131,18 +131,12 @@ const mainPage = () => {
         }
     }
     const renderContentLongDiv = () => {
-        switch (activePage) {
-            case "Overview":
-                return <Map selectedPackages={selectedPackages}/>
-            case "History":
-                return <Map selectedPackages={selectedPackages}/>
-            case "Package locker":
-                return <Map selectedPackages={selectedPackages}/>
-        }
+        return <Map selectedPackages={selectedPackages}/>
     }
     
     return (
         <div className="body">
+            <WebSocketComponent setFilteredPackages={setFilteredPackages} setFilteredDeliveredPackages={setFilteredDeliveredPackages}/>
             <div className="gridContainer">
                 <div className="column1">
                     <Header 

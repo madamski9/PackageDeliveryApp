@@ -79,7 +79,6 @@ const PackageLocker = ({ fetchPackage, longDivVisible, setLongDivVisible, handle
                 console.error("Błąd podczas zapisu do API")
             }
         } catch (error) {
-            console.error("Błąd podczas aktualizacji numeru szafki")
         }
     }
 

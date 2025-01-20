@@ -10,6 +10,7 @@ import fs from 'fs'
 import https from 'https'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
+import WebSocket from 'ws'
 dotenv.config()
 
 const { Pool } = pkg
@@ -51,13 +52,26 @@ app.post("/mqtt/publish", (req, res) => {
     })
 })
 
-//! DATABASE API
-
 const options = {
   key: fs.readFileSync('../../certificates/localhost.key'),
-  cert: fs.readFileSync('../../certificates/localhost.crt'),
-};
+  cert: fs.readFileSync('../../certificates/localhost.crt')
+}
 app.server = https.createServer(options, app)
+const server = app.server
+
+//! WEBSOCKETS
+
+const wss = new WebSocket.Server({ server })
+// wss.on("connection", (ws) => {
+//   console.log("New WebSocket connection")
+
+//   ws.on("message", (msg) => {
+//     console.log("Received: ", msg)
+//   })
+//   ws.send("Connected to WebSocket")
+// })
+
+//! DATABASE API
 
 export const pool = new Pool({
   user: 'macciek',
@@ -197,10 +211,18 @@ clientMqtt.on('connect', () => {
 clientMqtt.on('error', (error) => {
   console.error('Błąd połączenia z brokerem MQTT:', error);
 })
+
+wss.on("connection", (ws) => {
+  console.log("New WebSocket connection")
+  ws.on("message", (msg) => {
+    console.log("Received: ", msg)
+  })
+})
+
 const updatePackageStatus = async () => {
   try {
     const client = await pool.connect()
-    const result = await client.query(`SELECT id, userId, status, number, lockernumber FROM public.packages WHERE status != 'Delivered'`)
+    const result = await client.query(`SELECT * FROM public.packages WHERE status != 'Delivered'`)
     console.log(result.rows)
 
     for (let packages of result.rows) {
@@ -214,6 +236,12 @@ const updatePackageStatus = async () => {
         console.log(`Updated package ${packages.id} to status: ${newStatus}`)
 
         if (newStatus === "Delivered") {
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                console.log("Sending delivered package to WebSocket client");
+                client.send(JSON.stringify(packages))
+            }
+          })
           if (!packages.lockernumber) {
             const randomNum = Math.floor(Math.random()*60) + 1
             await client.query(
@@ -244,7 +272,7 @@ const updatePackageStatus = async () => {
   }
 }
 
-setInterval(updatePackageStatus, 60*60 * 1000) //* co 60 min
+setInterval(updatePackageStatus, 10 * 1000) //* co 60 min
 
 app.post("/api/addLockerNumber", async (req, res) => {
   const { lockernumber, number } = req.body
@@ -329,5 +357,5 @@ app.delete("/api/deleteAllPackages", verifyToken, async (req, res) => {
 })
 
 app.server.listen(3001, () => {
-  console.log('API server running on https://localhost:3001');
+  console.log('API + WSS server running on https://localhost:3001');
 });

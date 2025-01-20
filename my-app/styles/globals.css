@@ -671,6 +671,8 @@
     background-color: rgb(234, 234, 234);
     border-radius: 20px;
     z-index: 2;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .notificationMsg {
     color: white;
@@ -787,11 +789,11 @@
 .content .status {
     font-weight: bold;
 }
-.locker-info {
+.locker-info2 {
     position: absolute;
     top: -40px; 
     left: 5%;
-    width: 180px;
+    width: 160px;
     transform: translateX(-50%);
     background: #fff;
     border: 1px solid #ccc;

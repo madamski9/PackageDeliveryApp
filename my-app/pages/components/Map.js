@@ -34,7 +34,7 @@ const Map = ({ selectedPackages }) => {
                             onMouseLeave={() => setShowLockerInfo(false)}
                         />
                         {showLockerInfo && (
-                            <div className="locker-info">
+                            <div className="locker-info2">
                                 Package locker number: {selectedPackages.packagelocker}
                             </div>
                         )}
