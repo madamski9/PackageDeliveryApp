@@ -17,6 +17,7 @@ const { Pool } = pkg
 const allowedOrigins = ['https://localhost:3000']
 export const app = express()
 app.use(bodyParser.json())
+//! kontrola jakie domeny uzyskuja dostep do serwera
 app.use(cors({
   origin: allowedOrigins, 
   methods: ['GET', 'POST'],
@@ -62,14 +63,6 @@ const server = app.server
 //! WEBSOCKETS
 
 const wss = new WebSocket.Server({ server })
-// wss.on("connection", (ws) => {
-//   console.log("New WebSocket connection")
-
-//   ws.on("message", (msg) => {
-//     console.log("Received: ", msg)
-//   })
-//   ws.send("Connected to WebSocket")
-// })
 
 //! DATABASE API
 
@@ -272,7 +265,7 @@ const updatePackageStatus = async () => {
   }
 }
 
-setInterval(updatePackageStatus, 60 * 60 * 1000) //* co 60 min
+setInterval(updatePackageStatus, 200 * 1000) //* czas dostarczenia paczki
 
 app.post("/api/addLockerNumber", async (req, res) => {
   const { lockernumber, number } = req.body

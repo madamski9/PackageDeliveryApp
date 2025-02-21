@@ -62,7 +62,7 @@ const HomePage = () => {
                 />
                 <input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Hasło"
+                    placeholder="Password"
                     className="input-passw"
                     onChange={(e) => setPassword(e.target.value)}
                 />
@@ -72,20 +72,24 @@ const HomePage = () => {
                     onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <img className="eye" src="/images/hidden.png"/> : <img className="eye" src="/images/eye-2.png"/>}
                 </button>
-                <div className="buttons">
+                <div 
+                    style={{display: "flex"}}
+                    className="buttons">
                     <button 
+                        style={{padding: "5px 10px"}}
                         className="register-button"
                         onClick={e => {
                             e.preventDefault()
                             router.push("/register")}}
                     >
-                        Zarejestruj się
+                        Register     
                     </button>
                     <button 
+                        style={{marginLeft: "60px", padding: "0px 10px"}}
                         className="login-button"
                         type="submit"
                     >
-                        Zaloguj się
+                        Log in
                     </button>
                 </div>
             </form>
